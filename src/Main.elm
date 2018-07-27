@@ -7,6 +7,7 @@ import Html exposing (..)
 import Json.Decode as Decode
 import Laman.Beranda as Beranda
 import Laman.GagalMuat as GagalMuat
+import Laman.RiwayatPelanggan as RiwayatPelanggan
 import Laman.Masuk as Masuk
 import Navigation exposing (Location)
 import Ports
@@ -20,6 +21,7 @@ type ModelLamanTermuat
     | LamanTakKetemu
     | LamanMasuk Masuk.Model
     | LamanBeranda Beranda.Model
+    | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanKeluar
     | LamanGagalMuat GagalMuat.LamanGagalDimuat
 
@@ -40,7 +42,9 @@ type Msg
     | SetPengguna (Maybe Pengguna.Pengguna)
     | MasukMsg Masuk.Msg
     | BerandaMsg Beranda.Msg
+    | RiwayatPelangganMsg RiwayatPelanggan.Msg
     | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat Beranda.Model)
+    | DetailPelangganTermuat (Result GagalMuat.LamanGagalDimuat RiwayatPelanggan.Model)
 
 
 getLaman : KondisiLaman -> ModelLamanTermuat
@@ -71,6 +75,9 @@ setRute mrute model =
 
         ( Just p, Just Rute.Beranda ) ->
             transisi DaftarPelangganTermuat (Beranda.init model.sesi)
+
+        (Just p, Just (Rute.DetailPelanggan nomormeteran)) ->
+            transisi DetailPelangganTermuat (RiwayatPelanggan.init model.sesi nomormeteran)
 
         ( Just p, Just Rute.Keluar ) ->
             let
@@ -135,6 +142,14 @@ updateLaman laman msg model =
             { model | kondisilaman = LamanSudahDimuat (LamanBeranda dp) }
                 => Cmd.none
 
+        ( DetailPelangganTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
+        ( DetailPelangganTermuat (Ok dp), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanRiwayatPelanggan dp) }
+                => Cmd.none
+
         ( SetPengguna p, _ ) ->
             let
                 cmd =
@@ -192,6 +207,10 @@ viewLaman sesi laman =
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map BerandaMsg
 
+        LamanRiwayatPelanggan submodel ->
+            RiwayatPelanggan.view sesi submodel
+                |> Bingkai.bingkai sesi.pengguna
+                |> Html.map RiwayatPelangganMsg
         LamanKeluar ->
             Html.text "keluar"
                 |> Bingkai.bingkai sesi.pengguna

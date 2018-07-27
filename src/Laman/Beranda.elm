@@ -59,7 +59,7 @@ viewdatapelanggan pelanggan =
         , td [] [ text pelanggan.alamat ]
         , td [] [ text pelanggan.wilayah ]
         , td []
-            [ a [ Rute.href (Rute.DataPelanggan pelanggan.nomorMeteran) ]
+            [ a [ Rute.href (Rute.DetailPelanggan pelanggan.nomorMeteran) ]
                 [ text pelanggan.nomorMeteran ]
             ]
         ]
@@ -88,8 +88,17 @@ update sesi msg model =
                                 |> Decode.decodeString Decode.string
                                 |> Result.withDefault "bad code."
 
-                        _ ->
-                            "Lanjutkan nanti."
+                        Http.BadPayload yangsalah _ ->
+                            yangsalah
+
+                        Http.BadUrl u ->
+                            u ++ " salah."
+
+                        Http.Timeout ->
+                            "timeout."
+
+                        Http.NetworkError ->
+                            "cek sambungan internet."
             in
             { model | galat = pesangalat } => Cmd.none
 

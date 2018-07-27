@@ -10,7 +10,7 @@ type Rute
     = Beranda
     | Root
     | Masuk
-    | DataPelanggan String
+    | DetailPelanggan String
     | Keluar
 
 
@@ -19,7 +19,7 @@ rute =
     oneOf
         [ Url.map Beranda (s "")
         , Url.map Masuk (s "masuk")
-        , Url.map DataPelanggan (s "pelanggan" </> string)
+        , Url.map DetailPelanggan (s "pelanggan" </> string)
         , Url.map Keluar (s "keluar")
         ]
 
@@ -38,7 +38,7 @@ ruteKeString laman =
                 Masuk ->
                     [ "masuk" ]
 
-                DataPelanggan nomet ->
+                DetailPelanggan nomet ->
                     [ "pelanggan", nomet ]
 
                 Keluar ->

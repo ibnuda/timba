@@ -7,6 +7,7 @@ import Json.Decode.Pipeline exposing (custom, decode, optional, required)
 type alias TagihanSimple =
     { tahun : Int
     , bulan : Int
+    , minumLalu : Int
     , minumSekarang : Int
     , tanggalBayar : String
     }
@@ -28,6 +29,7 @@ tagihanSimpleDecoder =
     decode TagihanSimple
         |> required "tahun" Decode.int
         |> required "bulan" Decode.int
+        |> required "minum_lalu" Decode.int
         |> required "minum_sekarang" Decode.int
         |> optional "tanggal_bayar" Decode.string "Belum Dibayar"
 
