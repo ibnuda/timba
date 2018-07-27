@@ -10,9 +10,6 @@ type Rute
     = Beranda
     | Root
     | Masuk
-    | DaftarPengguna
-    | PenggunaSpesifik String
-    | TagihanSpesifik String Int Int
     | Keluar
 
 
@@ -21,9 +18,7 @@ rute =
     oneOf
         [ Url.map Beranda (s "")
         , Url.map Masuk (s "masuk")
-        , Url.map DaftarPengguna (s "pengguna")
-        , Url.map PenggunaSpesifik (s "pengguna" </> string)
-        , Url.map TagihanSpesifik (s "tagihan" </> string </> int </> int)
+        , Url.map Keluar (s "keluar")
         ]
 
 
@@ -40,15 +35,6 @@ ruteKeString laman =
 
                 Masuk ->
                     [ "masuk" ]
-
-                DaftarPengguna ->
-                    [ "pengguna" ]
-
-                PenggunaSpesifik notelp ->
-                    [ "pengguna", notelp ]
-
-                TagihanSpesifik nomet tahun bulan ->
-                    [ "tagihan", nomet, toString tahun, toString bulan ]
 
                 Keluar ->
                     [ "keluar" ]

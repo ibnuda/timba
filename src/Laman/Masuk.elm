@@ -89,6 +89,11 @@ update mess model =
 
         AjukanBorang ->
             case validate validatorModel model of
+                [] ->
+                    { model | galat = [] }
+                        => Http.send MasukSelesai (Request.KeluarMasuk.masuk model)
+                        => NoOp
+
                 x ->
                     { model | galat = x }
                         => Cmd.none
