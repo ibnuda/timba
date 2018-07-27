@@ -6,6 +6,7 @@ import Data.Sesi exposing (Sesi)
 import Html exposing (..)
 import Json.Decode as Decode
 import Laman.Beranda as Beranda
+import Laman.GagalMuat as GagalMuat
 import Laman.Masuk as Masuk
 import Navigation exposing (Location)
 import Ports
@@ -20,6 +21,7 @@ type ModelLamanTermuat
     | LamanMasuk Masuk.Model
     | LamanBeranda Beranda.Model
     | LamanKeluar
+    | LamanGagalMuat GagalMuat.LamanGagalDimuat
 
 
 type KondisiLaman
@@ -38,6 +40,7 @@ type Msg
     | SetPengguna (Maybe Pengguna.Pengguna)
     | MasukMsg Masuk.Msg
     | BerandaMsg Beranda.Msg
+    | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat Beranda.Model)
 
 
 getLaman : KondisiLaman -> ModelLamanTermuat
@@ -50,7 +53,7 @@ getLaman kl =
             l
 
 
-setRute : Maybe Rute.Rute -> Model -> ( Model, Cmd msg )
+setRute : Maybe Rute.Rute -> Model -> ( Model, Cmd Msg )
 setRute mrute model =
     let
         transisi kemsg task =
@@ -66,6 +69,9 @@ setRute mrute model =
             { model | kondisilaman = LamanSudahDimuat (LamanMasuk Masuk.initmodel) }
                 => Cmd.none
 
+        ( Just p, Just Rute.Beranda ) ->
+            transisi DaftarPelangganTermuat (Beranda.init model.sesi)
+
         ( Just p, Just Rute.Keluar ) ->
             let
                 sesi =
@@ -78,7 +84,7 @@ setRute mrute model =
                     ]
 
         ( Just p, _ ) ->
-            { model | kondisilaman = LamanSudahDimuat (LamanBeranda Beranda.initmodel) }
+            { model | kondisilaman = LamanSudahDimuat LamanKosong }
                 => Cmd.none
 
 
@@ -121,6 +127,14 @@ updateLaman laman msg model =
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanMasuk modellaman) }
                 => Cmd.map MasukMsg cmd
 
+        ( DaftarPelangganTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
+        ( DaftarPelangganTermuat (Ok dp), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanBeranda dp) }
+                => Cmd.none
+
         ( SetPengguna p, _ ) ->
             let
                 cmd =
@@ -160,6 +174,10 @@ viewLaman sesi laman =
             Html.text "kosong"
                 |> Bingkai.bingkai sesi.pengguna
 
+        LamanGagalMuat gagal ->
+            GagalMuat.view sesi gagal
+                |> Bingkai.bingkai sesi.pengguna
+
         LamanTakKetemu ->
             Html.text "halaman tidak ketemu"
                 |> Bingkai.bingkai sesi.pengguna
@@ -169,8 +187,8 @@ viewLaman sesi laman =
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map MasukMsg
 
-        LamanBeranda _ ->
-            Beranda.view sesi.pengguna
+        LamanBeranda submodel ->
+            Beranda.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map BerandaMsg
 
