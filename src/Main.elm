@@ -8,8 +8,10 @@ import Json.Decode as Decode
 import Laman.Beranda as Beranda
 import Laman.Masuk as Masuk
 import Navigation exposing (Location)
+import Ports
 import Task
 import Util exposing (..)
+import Views.Bingkai as Bingkai
 
 
 type ModelLamanTermuat
@@ -17,6 +19,7 @@ type ModelLamanTermuat
     | LamanTakKetemu
     | LamanMasuk Masuk.Model
     | LamanBeranda Beranda.Model
+    | LamanKeluar
 
 
 type KondisiLaman
@@ -62,6 +65,17 @@ setRute mrute model =
         ( Nothing, _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanMasuk Masuk.initmodel) }
                 => Cmd.none
+
+        ( Just p, Just Rute.Keluar ) ->
+            let
+                sesi =
+                    model.sesi
+            in
+            { model | sesi = { sesi | pengguna = Nothing } }
+                => Cmd.batch
+                    [ Ports.storeSession Nothing
+                    , Rute.modifikasiUrl Rute.Masuk
+                    ]
 
         ( Just p, _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanBeranda Beranda.initmodel) }
@@ -141,28 +155,28 @@ view model =
 
 viewLaman : Sesi -> ModelLamanTermuat -> Html Msg
 viewLaman sesi laman =
-    let
-        bingkai konten =
-            div [] [ konten ]
-    in
     case laman of
         LamanKosong ->
             Html.text "kosong"
-                |> bingkai
+                |> Bingkai.bingkai sesi.pengguna
 
         LamanTakKetemu ->
             Html.text "halaman tidak ketemu"
-                |> bingkai
+                |> Bingkai.bingkai sesi.pengguna
 
         LamanMasuk x ->
             Masuk.view sesi x
-                |> bingkai
+                |> Bingkai.bingkai sesi.pengguna
                 |> Html.map MasukMsg
 
         LamanBeranda _ ->
             Beranda.view sesi.pengguna
-                |> bingkai
+                |> Bingkai.bingkai sesi.pengguna
                 |> Html.map BerandaMsg
+
+        LamanKeluar ->
+            Html.text "keluar"
+                |> Bingkai.bingkai sesi.pengguna
 
 
 init : Decode.Value -> Location -> ( Model, Cmd Msg )
