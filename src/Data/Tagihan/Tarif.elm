@@ -21,7 +21,7 @@ decoderTarifItem : Decoder TarifItem
 decoderTarifItem =
     decode TarifItem
         |> required "mulai" Decode.int
-        |> optional "sampai" Decode.int 1111111
+        |> optional "sampai" Decode.int 0
         |> required "harga" Decode.int
 
 

@@ -34,17 +34,19 @@ init sesi nomormeteran =
     Task.map (Model "") dpel
         |> Task.mapError gagalpenangan
 
+
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
-    div [ ]
-        [ p [ ] [ text <| "Nama: " ++ model.detailpelanggan.namaPelanggan ]
-        , p [ ] [ text <| "Nomor Meteran: " ++ model.detailpelanggan.nomorMeteran ]
-        , p [ ] [ text <| "Nomor Telepon: " ++ model.detailpelanggan.nomorTelepon ]
-        , p [ ] [ text <| "Alamat: " ++ model.detailpelanggan.alamat ]
-        , p [ ] [ text <| "Wilayah: " ++ model.detailpelanggan.wilayah ]
-        , p [ ] [ text <| "Tanggah Daftar: " ++ model.detailpelanggan.tanggalDaftar ]
+    div []
+        [ p [] [ text <| "Nama: " ++ model.detailpelanggan.namaPelanggan ]
+        , p [] [ text <| "Nomor Meteran: " ++ model.detailpelanggan.nomorMeteran ]
+        , p [] [ text <| "Nomor Telepon: " ++ model.detailpelanggan.nomorTelepon ]
+        , p [] [ text <| "Alamat: " ++ model.detailpelanggan.alamat ]
+        , p [] [ text <| "Wilayah: " ++ model.detailpelanggan.wilayah ]
+        , p [] [ text <| "Tanggah Daftar: " ++ model.detailpelanggan.tanggalDaftar ]
         , viewriwayat model.detailpelanggan
         ]
+
 
 viewriwayat : DPelanggan.DetailPelanggan -> Html msg
 viewriwayat dp =
@@ -57,21 +59,27 @@ viewriwayat dp =
                 , th [] [ text "Tanggal Bayar" ]
                 ]
             ]
-        , tbody [] <| List.map viewtagihansimple dp.penggunaanAir
+        , tbody [] <| List.map (viewtagihansimple dp.nomorMeteran) dp.penggunaanAir
         ]
 
-viewtagihansimple : DPelanggan.TagihanSimple -> Html msg
-viewtagihansimple ts =
+
+viewtagihansimple : String -> DPelanggan.TagihanSimple -> Html msg
+viewtagihansimple nomormeteran ts =
     tr []
         [ td [] [ text <| toString ts.tahun ]
         , td [] [ text <| toString ts.bulan ]
         , td [] [ text <| toString <| ts.minumSekarang - ts.minumLalu ]
-        , td [] [ text ts.tanggalBayar ]
+        , td []
+            [ a [ Rute.href (Rute.DetailTagihan nomormeteran ts.tahun ts.bulan) ]
+                [ text ts.tanggalBayar ]
+            ]
         ]
 
-type Msg =
-    NoOp
+
+type Msg
+    = NoOp
     | DetailPelangganTerunduh (Result Http.Error DPelanggan.DetailPelanggan)
+
 
 update : Sesi.Sesi -> Msg -> Model -> ( Model, Cmd Msg )
 update sesi msg model =

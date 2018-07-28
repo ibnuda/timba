@@ -1,9 +1,17 @@
 module Data.Tagihan exposing (..)
 
-import Data.Pelanggan as Pelanggan exposing (..)
 import Data.Tagihan.Tarif as Tarif exposing (..)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (custom, decode, required, optional)
+import Json.Decode.Pipeline exposing (custom, decode, optional, required)
+
+
+type alias TagihanPelanggan =
+    { nomorPelanggan : Int
+    , namaPelanggan : String
+    , nomorTelepon : String
+    , alamat : String
+    , wilayah : String
+    }
 
 
 type alias Tagihan =
@@ -11,12 +19,22 @@ type alias Tagihan =
     , nomorMeteran : String
     , tahun : Int
     , bulan : Int
-    , pengguna : DataPelanggan
+    , pengguna : TagihanPelanggan
     , tarif : Tarif
     , minumLalu : Int
     , minumSekarang : Int
     , tanggalBayar : String
     }
+
+
+decoderTagihanPelanggan : Decoder TagihanPelanggan
+decoderTagihanPelanggan =
+    decode TagihanPelanggan
+        |> required "nomor_pelanggan" Decode.int
+        |> required "nama_pelanggan" Decode.string
+        |> required "nomor_telepon" Decode.string
+        |> required "alamat" Decode.string
+        |> required "wilayah" Decode.string
 
 
 decoderTagihan : Decoder Tagihan
@@ -26,7 +44,7 @@ decoderTagihan =
         |> required "nomor_meteran" Decode.string
         |> required "tahun" Decode.int
         |> required "bulan" Decode.int
-        |> required "pengguna" DataPelanggan.decoder
+        |> required "pengguna" decoderTagihanPelanggan
         |> required "tarif" Tarif.decoderTarif
         |> required "minum_lalu" Decode.int
         |> required "minum_sekarang" Decode.int
