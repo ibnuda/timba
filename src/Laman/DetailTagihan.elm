@@ -47,7 +47,9 @@ view _ model =
 viewTagihan : Tagihan.Tagihan -> Html msg
 viewTagihan tagihan =
     div []
-        [ h1 [] [ text "Tagihan Minum" ]
+        [ a [ Rute.href (Rute.DetailPelanggan tagihan.nomorMeteran) ]
+            [ text "Kembali" ]
+        , h1 [] [ text "Tagihan Minum" ]
         , p [] [ text <| "Nomor Meteran: " ++ tagihan.nomorMeteran ]
         , p [] [ text <| "Tahun : " ++ toString tagihan.tahun ++ " Bulan " ++ toString tagihan.bulan ]
         , p [] [ text <| "Tanggal Bayar : " ++ tagihan.tanggalBayar ]

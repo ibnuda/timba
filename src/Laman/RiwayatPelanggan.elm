@@ -4,6 +4,7 @@ import DaftarRute as Rute
 import Data.DetailPelanggan as DPelanggan
 import Data.Sesi as Sesi
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Http as Http
 import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
@@ -38,19 +39,32 @@ init sesi nomormeteran =
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
     div []
-        [ p [] [ text <| "Nama: " ++ model.detailpelanggan.namaPelanggan ]
-        , p [] [ text <| "Nomor Meteran: " ++ model.detailpelanggan.nomorMeteran ]
-        , p [] [ text <| "Nomor Telepon: " ++ model.detailpelanggan.nomorTelepon ]
-        , p [] [ text <| "Alamat: " ++ model.detailpelanggan.alamat ]
-        , p [] [ text <| "Wilayah: " ++ model.detailpelanggan.wilayah ]
-        , p [] [ text <| "Tanggah Daftar: " ++ model.detailpelanggan.tanggalDaftar ]
+        [ viewdetail model.detailpelanggan
         , viewriwayat model.detailpelanggan
+        ]
+
+
+viewdetail : DPelanggan.DetailPelanggan -> Html msg
+viewdetail dp =
+    div [ class "pure-g" ]
+        [ div [ class "pure-u-1 pure-u-md-1-3" ]
+            [ p [] [ text <| "Nama: " ++ dp.namaPelanggan ]
+            , p [] [ text <| "Nomor Meteran: " ++ dp.nomorMeteran ]
+            ]
+        , div [ class "pure-u-1 pure-u-md-1-3" ]
+            [ p [] [ text <| "Nomor Telepon: " ++ dp.wilayah ]
+            , p [] [ text <| "Alamat: " ++ dp.alamat ]
+            ]
+        , div [ class "pure-u-1 pure-u-md-1-3" ]
+            [ p [] [ text <| "Tanggal Daftar: " ++ dp.tanggalDaftar ]
+            , p [] [ text <| "Nomor Telepon: " ++ dp.nomorTelepon ]
+            ]
         ]
 
 
 viewriwayat : DPelanggan.DetailPelanggan -> Html msg
 viewriwayat dp =
-    table []
+    table [ class "pure-table pure-table-bordered" ]
         [ thead []
             [ tr []
                 [ th [] [ text "Tahun" ]

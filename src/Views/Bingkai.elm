@@ -8,7 +8,7 @@ import Html.Attributes exposing (..)
 
 bingkai : Maybe Pengguna.Pengguna -> Html msg -> Html msg
 bingkai mpengguna konten =
-    div [ class "konten" ]
+    div [ class "content" ]
         [ viewMenu mpengguna konten
         ]
 
@@ -31,12 +31,18 @@ viewMenu mpengguna konten =
                             [ p [ class "pure-menu-heading" ]
                                 [ text pengguna.nama ]
                             , ul [ class "pure-menu-list" ]
-                                [ li [ class "menu-item-divided" ]
-                                    [ a [ Rute.href Rute.Beranda ]
-                                        [ text "Daftar Pengguna" ]
+                                [ li [ class "pure-menu-item" ]
+                                    [ a
+                                        [ Rute.href Rute.Beranda
+                                        , class "pure-menu-link"
+                                        ]
+                                        [ text "Beranda" ]
                                     ]
-                                , li [ class "menu-item-divided" ]
-                                    [ a [ Rute.href Rute.Keluar ]
+                                , li [ class "pure-menu-item" ]
+                                    [ a
+                                        [ Rute.href Rute.Keluar
+                                        , class "pure-menu-link"
+                                        ]
                                         [ text "Keluar" ]
                                     ]
                                 ]

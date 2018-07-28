@@ -111,14 +111,15 @@ validatorModel =
 view : Sesi -> Model -> Html Msg
 view _ model =
     div []
-        [ Borang.viewGalat model.galat
+        [ h2 [ class "header" ] [ text "Masuk" ]
+        , Borang.viewGalat model.galat
         , viewBorang
         ]
 
 
 viewBorang : Html Msg
 viewBorang =
-    Html.form [ onSubmit AjukanBorang ]
+    Html.form [ onSubmit AjukanBorang, class "pure-form pure-form-stacked" ]
         [ Borang.input
             [ class " "
             , onInput SetTelepon
@@ -131,7 +132,7 @@ viewBorang =
             , placeholder "Sandi"
             ]
             []
-        , button [ class "button" ]
+        , button [ class "pure-button pure-button-primary" ]
             [ text "Masuk"
             ]
         ]

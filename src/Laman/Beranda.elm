@@ -4,6 +4,7 @@ import DaftarRute as Rute
 import Data.Pelanggan as Pelanggan
 import Data.Sesi as Sesi
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Http as Http
 import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
@@ -37,17 +38,20 @@ init sesi =
 
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
-    table []
-        [ thead []
-            [ tr []
-                [ th [] [ text "Nama" ]
-                , th [] [ text "Nomor Telepon" ]
-                , th [] [ text "Alamat" ]
-                , th [] [ text "Wilayah" ]
-                , th [] [ text "Nomor Meteran" ]
+    div []
+        [ h1 [] [ text "Daftar Pelanggan"]
+        , table [ class "pure-table pure-table-bordered" ]
+            [ thead []
+                [ tr []
+                    [ th [] [ text "Nama" ]
+                    , th [] [ text "Nomor Telepon" ]
+                    , th [] [ text "Alamat" ]
+                    , th [] [ text "Wilayah" ]
+                    , th [] [ text "Nomor Meteran" ]
+                    ]
                 ]
+            , tbody [] <| List.map viewdatapelanggan model.daftarpelanggan
             ]
-        , tbody [] <| List.map viewdatapelanggan model.daftarpelanggan
         ]
 
 
