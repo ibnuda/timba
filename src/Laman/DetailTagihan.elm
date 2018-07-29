@@ -73,7 +73,7 @@ viewTarif : Tarif.Tarif -> Html msg
 viewTarif tarif =
     div []
         [ p [] [ text <| "Biaya Beban :" ++ toString tarif.biayaBeban ]
-        , div [ class "pure-g" ] <| List.map viewTarifItem tarif.satuan
+        , div [ class "" ] <| List.map viewTarifItem tarif.satuan
         ]
 
 
@@ -86,7 +86,7 @@ viewTarifItem tarifitem =
             else
                 toString tarifitem.sampai
     in
-    div [ class "pure-u-1 pure-u-md-1-3" ]
+    div [ class "" ]
         [ p [] [ text <| "Mulai: " ++ toString tarifitem.mulai ]
         , p [] [ text <| "Sampai :" ++ sampai ]
         , p [] [ text <| "Harga: " ++ toString tarifitem.harga ]

@@ -38,7 +38,7 @@ init sesi nomormeteran =
 
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
-    div []
+    div [ class "content" ]
         [ viewdetail model.detailpelanggan
         , viewriwayat model.detailpelanggan
         ]
@@ -46,16 +46,16 @@ view _ model =
 
 viewdetail : DPelanggan.DetailPelanggan -> Html msg
 viewdetail dp =
-    div [ class "pure-g" ]
-        [ div [ class "pure-u-1 pure-u-md-1-3" ]
+    div []
+        [ div []
             [ p [] [ text <| "Nama: " ++ dp.namaPelanggan ]
             , p [] [ text <| "Nomor Meteran: " ++ dp.nomorMeteran ]
             ]
-        , div [ class "pure-u-1 pure-u-md-1-3" ]
+        , div []
             [ p [] [ text <| "Nomor Telepon: " ++ dp.wilayah ]
             , p [] [ text <| "Alamat: " ++ dp.alamat ]
             ]
-        , div [ class "pure-u-1 pure-u-md-1-3" ]
+        , div []
             [ p [] [ text <| "Tanggal Daftar: " ++ dp.tanggalDaftar ]
             , p [] [ text <| "Nomor Telepon: " ++ dp.nomorTelepon ]
             ]
@@ -64,26 +64,26 @@ viewdetail dp =
 
 viewriwayat : DPelanggan.DetailPelanggan -> Html msg
 viewriwayat dp =
-    table [ class "pure-table pure-table-bordered" ]
-        [ thead []
-            [ tr []
-                [ th [] [ text "Tahun" ]
-                , th [] [ text "Bulan" ]
-                , th [] [ text "Penggunaan Air" ]
-                , th [] [ text "Tanggal Bayar" ]
+    table [ class "table" ]
+        [ thead [ class "thead" ]
+            [ tr [ class "tr" ]
+                [ th [ class "th" ] [ text "Tahun" ]
+                , th [ class "th" ] [ text "Bulan" ]
+                , th [ class "th" ] [ text "Penggunaan Air" ]
+                , th [ class "th" ] [ text "Tanggal Bayar" ]
                 ]
             ]
-        , tbody [] <| List.map (viewtagihansimple dp.nomorMeteran) dp.penggunaanAir
+        , tbody [ class "tbody" ] <| List.map (viewtagihansimple dp.nomorMeteran) dp.penggunaanAir
         ]
 
 
 viewtagihansimple : String -> DPelanggan.TagihanSimple -> Html msg
 viewtagihansimple nomormeteran ts =
-    tr []
-        [ td [] [ text <| toString ts.tahun ]
-        , td [] [ text <| toString ts.bulan ]
-        , td [] [ text <| toString <| ts.minumSekarang - ts.minumLalu ]
-        , td []
+    tr [ class "tr" ]
+        [ td [ class "td" ] [ text <| toString ts.tahun ]
+        , td [ class "td" ] [ text <| toString ts.bulan ]
+        , td [ class "td" ] [ text <| toString <| ts.minumSekarang - ts.minumLalu ]
+        , td [ class "td" ]
             [ a [ Rute.href (Rute.DetailTagihan nomormeteran ts.tahun ts.bulan) ]
                 [ text ts.tanggalBayar ]
             ]

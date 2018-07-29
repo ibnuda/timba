@@ -111,28 +111,59 @@ validatorModel =
 view : Sesi -> Model -> Html Msg
 view _ model =
     div []
-        [ h2 [ class "header" ] [ text "Masuk" ]
+        [ h2 [ class "title" ] [ text "Masuk" ]
         , Borang.viewGalat model.galat
         , viewBorang
         ]
 
 
+
+--      <a href="#" class="card-footer-item">Save</a>
+--      <a href="#" class="card-footer-item">Edit</a>
+--      <a href="#" class="card-footer-item">Delete</a>
+--  <div class="card">
+--  <header class="card-header">
+--      <p class="card-header-title">
+--      Component
+--      </p>
+--      <a href="#" class="card-header-icon" aria-label="more options">
+--      <span class="icon">
+--          <i class="fas fa-angle-down" aria-hidden="true"></i>
+--      </span>
+--      </a>
+--  </header>
+--  <div class="card-content">
+--      <div class="content">
+--      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.
+--      <a href="#">@bulmaio</a>. <a href="#">#css</a> <a href="#">#responsive</a>
+--      <br>
+--      <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+--      </div>
+--  </div>
+--  <footer class="card-footer">
+--      <a href="#" class="card-footer-item">Save</a>
+--      <a href="#" class="card-footer-item">Edit</a>
+--      <a href="#" class="card-footer-item">Delete</a>
+--  </footer>
+--  </div>
+
+
 viewBorang : Html Msg
 viewBorang =
-    Html.form [ onSubmit AjukanBorang, class "pure-form pure-form-stacked" ]
+    Html.form [ onSubmit AjukanBorang, class "" ]
         [ Borang.input
-            [ class " "
+            [ class "input"
             , onInput SetTelepon
             , placeholder "Telepon"
             ]
             []
         , Borang.password
-            [ class " "
+            [ class "input"
             , onInput SetSandi
             , placeholder "Sandi"
             ]
             []
-        , button [ class "pure-button pure-button-primary" ]
+        , button [ class "button is-link" ]
             [ text "Masuk"
             ]
         ]

@@ -10,6 +10,7 @@ type Rute
     = Beranda
     | Root
     | Masuk
+    | DaftarPelanggan
     | DetailPelanggan String
     | DetailTagihan String Int Int
     | Keluar
@@ -18,8 +19,9 @@ type Rute
 rute : Parser (Rute -> a) a
 rute =
     oneOf
-        [ Url.map Beranda (s "")
-        , Url.map Masuk (s "masuk")
+        [ Url.map Masuk (s "masuk")
+        , Url.map Beranda (s "")
+        , Url.map DaftarPelanggan (s "pelanggan")
         , Url.map DetailPelanggan (s "pelanggan" </> string)
         , Url.map DetailTagihan (s "tagihan" </> string </> int </> int)
         , Url.map Keluar (s "keluar")
@@ -39,6 +41,9 @@ ruteKeString laman =
 
                 Masuk ->
                     [ "masuk" ]
+
+                DaftarPelanggan ->
+                    [ "pelanggan" ]
 
                 DetailPelanggan nomet ->
                     [ "pelanggan", nomet ]

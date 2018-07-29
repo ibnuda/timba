@@ -1,6 +1,6 @@
 module Views.Borang exposing (..)
 
-import Html exposing (Attribute, Html, fieldset, li, text, ul)
+import Html exposing (Attribute, Html, div, fieldset, li, text, ul)
 import Html.Attributes exposing (class, type_)
 
 
@@ -33,6 +33,7 @@ control :
     -> List (Html msg)
     -> Html msg
 control elemen attr children =
-    fieldset [ class "form-group" ]
-        [ elemen (class "form-control" :: attr) children
+    div [ class "field" ]
+        [ div [ class "control" ]
+            [ elemen attr children ]
         ]

@@ -1,9 +1,10 @@
-module Laman.Beranda exposing (..)
+module Laman.DaftarPelanggan exposing (..)
 
 import DaftarRute as Rute
 import Data.Pelanggan as Pelanggan
 import Data.Sesi as Sesi
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Attributes exposing (..)
 import Http as Http
 import Json.Decode as Decode
@@ -39,30 +40,30 @@ init sesi =
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
     div []
-        [ h1 [] [ text "Daftar Pelanggan"]
-        , table [ class "pure-table pure-table-bordered" ]
-            [ thead []
-                [ tr []
-                    [ th [] [ text "Nama" ]
-                    , th [] [ text "Nomor Telepon" ]
-                    , th [] [ text "Alamat" ]
-                    , th [] [ text "Wilayah" ]
-                    , th [] [ text "Nomor Meteran" ]
+        [ h1 [ class "header" ] [ text "Daftar Pelanggan" ]
+        , table [ class "table" ]
+            [ thead [ class "thead" ]
+                [ tr [ class "tr" ]
+                    [ th [ class "th" ] [ text "Nama" ]
+                    , th [ class "th" ] [ text "Nomor Telepon" ]
+                    , th [ class "th" ] [ text "Alamat" ]
+                    , th [ class "th" ] [ text "Wilayah" ]
+                    , th [ class "th" ] [ text "Nomor Meteran" ]
                     ]
                 ]
-            , tbody [] <| List.map viewdatapelanggan model.daftarpelanggan
+            , tbody [ class "tbody" ] <| List.map viewdatapelanggan model.daftarpelanggan
             ]
         ]
 
 
 viewdatapelanggan : Pelanggan.Pelanggan -> Html msg
 viewdatapelanggan pelanggan =
-    tr []
-        [ td [] [ text pelanggan.namaPelanggan ]
-        , td [] [ text pelanggan.nomorTelepon ]
-        , td [] [ text pelanggan.alamat ]
-        , td [] [ text pelanggan.wilayah ]
-        , td []
+    tr [ class "tr" ]
+        [ td [ class "td" ] [ text pelanggan.namaPelanggan ]
+        , td [ class "td" ] [ text pelanggan.nomorTelepon ]
+        , td [ class "td" ] [ text pelanggan.alamat ]
+        , td [ class "td" ] [ text pelanggan.wilayah ]
+        , td [ class "td" ]
             [ a [ Rute.href (Rute.DetailPelanggan pelanggan.nomorMeteran) ]
                 [ text pelanggan.nomorMeteran ]
             ]

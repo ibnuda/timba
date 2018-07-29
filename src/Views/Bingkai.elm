@@ -4,52 +4,55 @@ import DaftarRute as Rute exposing (..)
 import Data.Pengguna as Pengguna
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Aria exposing (..)
 
 
 bingkai : Maybe Pengguna.Pengguna -> Html msg -> Html msg
 bingkai mpengguna konten =
-    div [ class "content" ]
-        [ viewMenu mpengguna konten
-        ]
+    --  div [ class "container is-fluid" ]
+    lihatIsi mpengguna konten
 
-
-viewMenu : Maybe Pengguna.Pengguna -> Html msg -> Html msg
-viewMenu mpengguna konten =
+lihatIsi : Maybe Pengguna.Pengguna -> Html msg -> Html msg
+lihatIsi mpengguna konten =
     case mpengguna of
         Nothing ->
-            div [ class "pure-g" ]
-                [ div [ class "content pure-u-1 pure-u-md-24-24" ]
+            div [ class "container is-fluid" ]
+                [ section [ class "section" ]
                     [ konten
                     ]
                 ]
 
         Just pengguna ->
-            div [ class "pure-g" ]
-                [ div [ class "pure-u-1 pure-u-md-3-24" ]
-                    [ div [ id "menu" ]
-                        [ div [ class "pure-menu" ]
-                            [ p [ class "pure-menu-heading" ]
-                                [ text pengguna.nama ]
-                            , ul [ class "pure-menu-list" ]
-                                [ li [ class "pure-menu-item" ]
-                                    [ a
-                                        [ Rute.href Rute.Beranda
-                                        , class "pure-menu-link"
-                                        ]
-                                        [ text "Beranda" ]
-                                    ]
-                                , li [ class "pure-menu-item" ]
-                                    [ a
-                                        [ Rute.href Rute.Keluar
-                                        , class "pure-menu-link"
-                                        ]
-                                        [ text "Keluar" ]
-                                    ]
-                                ]
-                            ]
+            div []
+                [ navigasibar
+                , div [ class "container is-fluid" ]
+                    [ section [ class "section" ]
+                        [ konten
                         ]
                     ]
-                , div [ class "content pure-u-1 pure-u-md-21-24" ]
-                    [ konten
-                    ]
                 ]
+
+
+navigasibar : Html msg
+navigasibar =
+    nav [ class "navbar is-blue", role "navigation" ]
+        [ div [ class "navbar-brand" ]
+            [ a [ Rute.href Rute.Beranda, class "navbar-item brand-text" ]
+                [ text "Timba" ]
+            , div [ class "navbar-burger" ]
+                [ span [ ariaHidden True ] []
+                , span [ ariaHidden True ] []
+                , span [ ariaHidden True ] []
+                ]
+            ]
+        , div [ id "navMenu", class "navbar-menu" ]
+            [ div [ class "navbar-start" ]
+                [ a [ Rute.href Rute.DaftarPelanggan, class "navbar-item" ]
+                    [ text "Pelanggan" ]
+                ]
+            , div [ class "navbar-end" ]
+                [ a [ Rute.href Rute.Keluar, class "navbar-item" ]
+                    [ text "Keluar" ]
+                ]
+            ]
+        ]

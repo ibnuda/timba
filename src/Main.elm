@@ -5,7 +5,8 @@ import Data.Pengguna as Pengguna
 import Data.Sesi exposing (Sesi)
 import Html exposing (..)
 import Json.Decode as Decode
-import Laman.Beranda as Beranda
+import Laman.Ikhtisar as Ikhtisar
+import Laman.DaftarPelanggan as DaftarPelanggan
 import Laman.GagalMuat as GagalMuat
 import Laman.Masuk as Masuk
 import Laman.RiwayatPelanggan as RiwayatPelanggan
@@ -21,7 +22,8 @@ type ModelLamanTermuat
     = LamanKosong
     | LamanTakKetemu
     | LamanMasuk Masuk.Model
-    | LamanBeranda Beranda.Model
+    | LamanIkhtisar Ikhtisar.Model
+    | LamanDaftarPelanggan DaftarPelanggan.Model
     | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanDetailTagihan DetailTagihan.Model
     | LamanKeluar
@@ -43,10 +45,11 @@ type Msg
     = SetRute (Maybe Rute.Rute)
     | SetPengguna (Maybe Pengguna.Pengguna)
     | MasukMsg Masuk.Msg
-    | BerandaMsg Beranda.Msg
+    | DaftarPelangganMsg DaftarPelanggan.Msg
     | DetailTagihanMsg DetailTagihan.Msg
     | RiwayatPelangganMsg RiwayatPelanggan.Msg
-    | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat Beranda.Model)
+    | IkhtisarTermuat (Result GagalMuat.LamanGagalDimuat Ikhtisar.Model)
+    | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat DaftarPelanggan.Model)
     | DetailPelangganTermuat (Result GagalMuat.LamanGagalDimuat RiwayatPelanggan.Model)
     | DetailTagihanTermuat (Result GagalMuat.LamanGagalDimuat DetailTagihan.Model)
 
@@ -77,8 +80,11 @@ setRute mrute model =
             { model | kondisilaman = LamanSudahDimuat (LamanMasuk Masuk.initmodel) }
                 => Cmd.none
 
-        ( Just p, Just Rute.Beranda ) ->
-            transisi DaftarPelangganTermuat (Beranda.init model.sesi)
+        ( Just p, Just Rute.Beranda) ->
+            transisi IkhtisarTermuat (Ikhtisar.init model.sesi)
+
+        ( Just p, Just Rute.DaftarPelanggan ) ->
+            transisi DaftarPelangganTermuat (DaftarPelanggan.init model.sesi)
 
         ( Just p, Just (Rute.DetailPelanggan nomormeteran) ) ->
             transisi DetailPelangganTermuat (RiwayatPelanggan.init model.sesi nomormeteran)
@@ -145,8 +151,16 @@ updateLaman laman msg model =
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
+        ( IkhtisarTermuat (Ok i), _) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanIkhtisar i) }
+                => Cmd.none
+
+        (IkhtisarTermuat (Err g), _) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
         ( DaftarPelangganTermuat (Ok dp), _ ) ->
-            { model | kondisilaman = LamanSudahDimuat (LamanBeranda dp) }
+            { model | kondisilaman = LamanSudahDimuat (LamanDaftarPelanggan dp) }
                 => Cmd.none
 
         ( DetailPelangganTermuat (Err g), _ ) ->
@@ -169,7 +183,7 @@ updateLaman laman msg model =
             let
                 cmd =
                     if sesi.pengguna /= Nothing && p == Nothing then
-                        Rute.modifikasiUrl Rute.Beranda
+                        Rute.modifikasiUrl Rute.DaftarPelanggan
                     else
                         Cmd.none
             in
@@ -217,10 +231,14 @@ viewLaman sesi laman =
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map MasukMsg
 
-        LamanBeranda submodel ->
-            Beranda.view sesi submodel
+        LamanIkhtisar submodel ->
+            Ikhtisar.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna
-                |> Html.map BerandaMsg
+
+        LamanDaftarPelanggan submodel ->
+            DaftarPelanggan.view sesi submodel
+                |> Bingkai.bingkai sesi.pengguna
+                |> Html.map DaftarPelangganMsg
 
         LamanRiwayatPelanggan submodel ->
             RiwayatPelanggan.view sesi submodel
