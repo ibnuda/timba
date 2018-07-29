@@ -5,12 +5,13 @@ import Data.Pengguna as Pengguna
 import Data.Sesi exposing (Sesi)
 import Html exposing (..)
 import Json.Decode as Decode
-import Laman.Ikhtisar as Ikhtisar
 import Laman.DaftarPelanggan as DaftarPelanggan
+import Laman.DaftarTarif as DaftarTarif
+import Laman.DetailTagihan as DetailTagihan
 import Laman.GagalMuat as GagalMuat
+import Laman.Ikhtisar as Ikhtisar
 import Laman.Masuk as Masuk
 import Laman.RiwayatPelanggan as RiwayatPelanggan
-import Laman.DetailTagihan as DetailTagihan 
 import Navigation exposing (Location)
 import Ports
 import Task
@@ -24,6 +25,7 @@ type ModelLamanTermuat
     | LamanMasuk Masuk.Model
     | LamanIkhtisar Ikhtisar.Model
     | LamanDaftarPelanggan DaftarPelanggan.Model
+    | LamanDaftarTarif DaftarTarif.Model
     | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanDetailTagihan DetailTagihan.Model
     | LamanKeluar
@@ -46,10 +48,12 @@ type Msg
     | SetPengguna (Maybe Pengguna.Pengguna)
     | MasukMsg Masuk.Msg
     | DaftarPelangganMsg DaftarPelanggan.Msg
+    | DaftarTarifMsg DaftarTarif.Msg
     | DetailTagihanMsg DetailTagihan.Msg
     | RiwayatPelangganMsg RiwayatPelanggan.Msg
     | IkhtisarTermuat (Result GagalMuat.LamanGagalDimuat Ikhtisar.Model)
     | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat DaftarPelanggan.Model)
+    | DaftarTarifTermuat (Result GagalMuat.LamanGagalDimuat DaftarTarif.Model)
     | DetailPelangganTermuat (Result GagalMuat.LamanGagalDimuat RiwayatPelanggan.Model)
     | DetailTagihanTermuat (Result GagalMuat.LamanGagalDimuat DetailTagihan.Model)
 
@@ -80,16 +84,19 @@ setRute mrute model =
             { model | kondisilaman = LamanSudahDimuat (LamanMasuk Masuk.initmodel) }
                 => Cmd.none
 
-        ( Just p, Just Rute.Beranda) ->
+        ( Just p, Just Rute.Beranda ) ->
             transisi IkhtisarTermuat (Ikhtisar.init model.sesi)
 
         ( Just p, Just Rute.DaftarPelanggan ) ->
             transisi DaftarPelangganTermuat (DaftarPelanggan.init model.sesi)
 
+        ( Just p, Just Rute.DaftarTarif ) ->
+            transisi DaftarTarifTermuat (DaftarTarif.init model.sesi)
+
         ( Just p, Just (Rute.DetailPelanggan nomormeteran) ) ->
             transisi DetailPelangganTermuat (RiwayatPelanggan.init model.sesi nomormeteran)
 
-        (Just p, Just (Rute.DetailTagihan nomet tahun bulan)) ->
+        ( Just p, Just (Rute.DetailTagihan nomet tahun bulan) ) ->
             transisi DetailTagihanTermuat (DetailTagihan.init model.sesi nomet tahun bulan)
 
         ( Just p, Just Rute.Keluar ) ->
@@ -151,11 +158,11 @@ updateLaman laman msg model =
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
-        ( IkhtisarTermuat (Ok i), _) ->
+        ( IkhtisarTermuat (Ok i), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanIkhtisar i) }
                 => Cmd.none
 
-        (IkhtisarTermuat (Err g), _) ->
+        ( IkhtisarTermuat (Err g), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
@@ -164,6 +171,14 @@ updateLaman laman msg model =
                 => Cmd.none
 
         ( DetailPelangganTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
+        ( DaftarTarifTermuat (Ok dp), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanDaftarTarif dp) }
+                => Cmd.none
+
+        ( DaftarTarifTermuat (Err g), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
@@ -240,6 +255,11 @@ viewLaman sesi laman =
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map DaftarPelangganMsg
 
+        LamanDaftarTarif submodel ->
+            DaftarTarif.view sesi submodel
+                |> Bingkai.bingkai sesi.pengguna
+                |> Html.map DaftarTarifMsg
+
         LamanRiwayatPelanggan submodel ->
             RiwayatPelanggan.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna
@@ -249,7 +269,6 @@ viewLaman sesi laman =
             DetailTagihan.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map DetailTagihanMsg
-
 
         LamanKeluar ->
             Html.text "keluar"

@@ -11,6 +11,7 @@ type Rute
     | Root
     | Masuk
     | DaftarPelanggan
+    | DaftarTarif
     | DetailPelanggan String
     | DetailTagihan String Int Int
     | Keluar
@@ -22,6 +23,7 @@ rute =
         [ Url.map Masuk (s "masuk")
         , Url.map Beranda (s "")
         , Url.map DaftarPelanggan (s "pelanggan")
+        , Url.map DaftarTarif (s "tarif")
         , Url.map DetailPelanggan (s "pelanggan" </> string)
         , Url.map DetailTagihan (s "tagihan" </> string </> int </> int)
         , Url.map Keluar (s "keluar")
@@ -44,6 +46,9 @@ ruteKeString laman =
 
                 DaftarPelanggan ->
                     [ "pelanggan" ]
+
+                DaftarTarif ->
+                    [ "tarif" ]
 
                 DetailPelanggan nomet ->
                     [ "pelanggan", nomet ]

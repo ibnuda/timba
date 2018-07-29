@@ -16,6 +16,22 @@ pair a b =
     a => b
 
 
+(!!) : List a -> Int -> Maybe a
+(!!) xs n =
+    List.head (List.drop n xs)
+infixl 9 !!
+
+
+paksa : String -> Int
+paksa x =
+    case String.toInt x of
+        Err _ ->
+            0
+
+        Ok a ->
+            a
+
+
 onClickStopPropagation : a -> Attribute a
 onClickStopPropagation msg =
     onWithOptions "click" { defaultOptions | stopPropagation = True } (Decode.succeed msg)

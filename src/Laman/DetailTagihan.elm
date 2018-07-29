@@ -72,24 +72,16 @@ viewPelanggan pelanggan =
 viewTarif : Tarif.Tarif -> Html msg
 viewTarif tarif =
     div []
-        [ p [] [ text <| "Biaya Beban :" ++ toString tarif.biayaBeban ]
-        , div [ class "" ] <| List.map viewTarifItem tarif.satuan
-        ]
-
-
-viewTarifItem : Tarif.TarifItem -> Html msg
-viewTarifItem tarifitem =
-    let
-        sampai =
-            if tarifitem.sampai == 0 then
-                ""
-            else
-                toString tarifitem.sampai
-    in
-    div [ class "" ]
-        [ p [] [ text <| "Mulai: " ++ toString tarifitem.mulai ]
-        , p [] [ text <| "Sampai :" ++ sampai ]
-        , p [] [ text <| "Harga: " ++ toString tarifitem.harga ]
+        [ p [] [ text <| "Biaya Beban :" ++ toString tarif.biayabeban ]
+        , div [ class "" ]
+            [ p [] [ text "Mulai: 0" ]
+            , p [] [ text <| "Sampai: " ++ toString tarif.hargaawal ]
+            , p [] [ text <| "Harga: " ++ toString tarif.sampaiawal ]
+            , p [] [ text <| "Mulai: " ++ toString tarif.sampaiawal ]
+            , p [] [ text <| "Harga: " ++ toString tarif.hargatengah ]
+            , p [] [ text <| "Mulai: " ++ toString tarif.sampaitengah ]
+            , p [] [ text <| "Harga: " ++ toString tarif.hargaakhir ]
+            ]
         ]
 
 

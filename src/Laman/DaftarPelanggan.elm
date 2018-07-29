@@ -39,8 +39,11 @@ init sesi =
 
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
-    div []
-        [ h1 [ class "header" ] [ text "Daftar Pelanggan" ]
+    div [ class "container" ]
+        [ h1 [ class "header" ]
+            [ p [ class "header" ]
+                [ text "Daftar Pelanggan" ]
+            ]
         , table [ class "table" ]
             [ thead [ class "thead" ]
                 [ tr [ class "tr" ]

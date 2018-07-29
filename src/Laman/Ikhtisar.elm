@@ -66,31 +66,17 @@ viewtarif : Tarif.Tarif -> Html msg
 viewtarif tarif =
     div []
         [ div [ class "column" ]
-            [ p []
-                [ text <| "Biaya beban: " ++ toString tarif.biayaBeban
-                ]
+            [ p [ class "subtitle" ]
+                [ text <| "Biaya beban: " ++ toString tarif.biayabeban ]
             ]
-        , div [ class "columns" ] <| List.map viewtarifitem tarif.satuan
-        ]
-
-
-viewtarifitem : Tarif.TarifItem -> Html msg
-viewtarifitem tarifitem =
-    let
-        sampai =
-            if tarifitem.sampai == 0 then
-                ""
-            else
-                toString tarifitem.sampai
-    in
-    div [ class "column is-third" ]
-        [ div [ class "card" ]
-            [ div [ class "card-content" ]
-                [ div [ class "content" ]
-                    [ p [] [ text <| "Mulai: " ++ toString tarifitem.mulai ]
-                    , p [] [ text <| "Sampai: " ++ sampai ]
-                    , p [] [ text <| "Harga: " ++ toString tarifitem.harga ]
-                    ]
-                ]
+        , div [ class "" ]
+            [ p [] [ text "Mulai: 0" ]
+            , p [] [ text <| "Sampai: " ++ toString tarif.hargaawal ]
+            , p [] [ text <| "Harga: " ++ toString tarif.sampaiawal ]
+            , p [] [ text <| "Mulai: " ++ toString tarif.sampaiawal ]
+            , p [] [ text <| "Harga: " ++ toString tarif.hargatengah ]
+            , p [] [ text <| "Mulai: " ++ toString tarif.sampaitengah ]
+            , p [] [ text <| "Harga: " ++ toString tarif.hargaakhir ]
             ]
         ]
+

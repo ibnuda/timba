@@ -4,29 +4,24 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 
 
-type alias TarifItem =
-    { mulai : Int
-    , sampai : Int
-    , harga : Int
-    }
-
 
 type alias Tarif =
-    { biayaBeban : Int
-    , satuan : List TarifItem
+    { biayabeban : Int
+    , hargaawal : Int
+    , sampaiawal : Int
+    , hargatengah : Int
+    , sampaitengah : Int
+    , hargaakhir : Int
     }
-
-
-decoderTarifItem : Decoder TarifItem
-decoderTarifItem =
-    decode TarifItem
-        |> required "mulai" Decode.int
-        |> optional "sampai" Decode.int 0
-        |> required "harga" Decode.int
 
 
 decoderTarif : Decoder Tarif
 decoderTarif =
     decode Tarif
         |> required "biaya_beban" Decode.int
-        |> required "satuan" (Decode.list decoderTarifItem)
+        |> required "harga_awal" Decode.int
+        |> required "sampai_awal" Decode.int
+        |> required "harga_tengah" Decode.int
+        |> required "sampai_tengah" Decode.int
+        |> required "harga_akhir" Decode.int
+
