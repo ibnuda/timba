@@ -7,14 +7,23 @@ import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
 
 
-bingkai : Maybe Pengguna.Pengguna -> Html msg -> Html msg
-bingkai mpengguna konten =
-    --  div [ class "container is-fluid" ]
-    lihatIsi mpengguna konten
+type LamanAktif
+    = AktifBeranda
+    | AktifIkhtisar
+    | AktifRoot
+    | AktifMasuk
+    | AktifPelanggan
+    | AktifTambahPelanggan
+    | AktifTarif
 
 
-lihatIsi : Maybe Pengguna.Pengguna -> Html msg -> Html msg
-lihatIsi mpengguna konten =
+bingkai : Maybe Pengguna.Pengguna -> LamanAktif -> Html msg -> Html msg
+bingkai mpengguna laman konten =
+    lihatIsi mpengguna laman konten
+
+
+lihatIsi : Maybe Pengguna.Pengguna -> LamanAktif -> Html msg -> Html msg
+lihatIsi mpengguna laman konten =
     case mpengguna of
         Nothing ->
             div [ class "container is-fluid" ]
@@ -25,7 +34,7 @@ lihatIsi mpengguna konten =
 
         Just pengguna ->
             div []
-                [ navigasibar
+                [ navigasibar laman
                 , div [ class "container is-fluid" ]
                     [ section [ class "section" ]
                         [ konten
@@ -34,27 +43,24 @@ lihatIsi mpengguna konten =
                 ]
 
 
-navigasibar : Html msg
-navigasibar =
-    nav [ class "navbar is-blue", role "navigation" ]
+navigasibar : LamanAktif -> Html msg
+navigasibar laman =
+    nav [ class "navbar is-blue", role "navigation", ariaLabel "main navigation" ]
         [ div [ class "navbar-brand" ]
             [ a [ Rute.href Rute.Beranda, class "navbar-item brand-text" ]
                 [ text "Timba" ]
-            , div [ class "navbar-burger" ]
+            , a [ role "button", class "navbar-burger is-active", ariaLabel "menu", ariaExpanded "true" ]
                 [ span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 ]
             ]
-        , div [ id "navMenu", class "navbar-menu" ]
+        , div [ id "navMenu", class "navbar-menu is-active" ]
             [ div [ class "navbar-start" ]
-                [ a [ Rute.href Rute.DaftarPelanggan, class "navbar-item" ]
-                    [ text "Pelanggan" ]
-                , a [ Rute.href Rute.TambahPelanggan, class "navbar-item" ]
-                    [ text "Tambah Pelanggan" ]
-                , a [ Rute.href Rute.DaftarTarif, class "navbar-item" ]
-                    [ text "Tarif" ]
+                [ tautannavbar laman Rute.DaftarPelanggan (a [ Rute.href Rute.DaftarPelanggan ] [ text "Pelanggan" ])
+                , tautannavbar laman Rute.TambahPelanggan (a [ Rute.href Rute.TambahPelanggan ] [ text "Tambah Pelanggan" ])
+                , tautannavbar laman Rute.DaftarTarif (a [ Rute.href Rute.DaftarTarif ] [ text "Daftar Tarif" ])
                 ]
             , div [ class "navbar-end" ]
                 [ a [ Rute.href Rute.Keluar, class "navbar-item" ]
@@ -64,3 +70,31 @@ navigasibar =
                 ]
             ]
         ]
+
+
+tautannavbar : LamanAktif -> Rute -> Html msg -> Html msg
+tautannavbar laman rute konten =
+    div [ classList [ ( "navbar-item", True ), ( "is-active", isactive laman rute ) ] ]
+        [ konten ]
+
+
+isactive : LamanAktif -> Rute -> Bool
+isactive laman rute =
+    case ( laman, rute ) of
+        ( AktifBeranda, Rute.Beranda ) ->
+            True
+
+        ( AktifIkhtisar, Rute.Beranda ) ->
+            True
+
+        ( AktifPelanggan, Rute.DaftarPelanggan ) ->
+            True
+
+        ( AktifTambahPelanggan, Rute.TambahPelanggan ) ->
+            True
+
+        ( AktifTarif, Rute.DaftarTarif ) ->
+            True
+
+        ( _, _ ) ->
+            False

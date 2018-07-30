@@ -280,53 +280,53 @@ viewLaman sesi laman =
     case laman of
         LamanKosong ->
             Html.text "kosong"
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifBeranda
 
         LamanGagalMuat gagal ->
             GagalMuat.view sesi gagal
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifBeranda
 
         LamanTakKetemu ->
             Html.text "halaman tidak ketemu"
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifBeranda
 
         LamanMasuk x ->
             Masuk.view sesi x
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifBeranda
                 |> Html.map MasukMsg
 
         LamanIkhtisar submodel ->
             Ikhtisar.view sesi submodel
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifBeranda
 
         LamanDaftarPelanggan submodel ->
             DaftarPelanggan.view sesi submodel
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifPelanggan
                 |> Html.map DaftarPelangganMsg
 
         LamanTambahPelanggan submodel ->
             TambahPelanggan.view sesi submodel
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifTambahPelanggan
                 |> Html.map TambahPelangganMsg
 
         LamanDaftarTarif submodel ->
             DaftarTarif.view sesi submodel
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifTarif
                 |> Html.map DaftarTarifMsg
 
         LamanRiwayatPelanggan submodel ->
             RiwayatPelanggan.view sesi submodel
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifRoot
                 |> Html.map RiwayatPelangganMsg
 
         LamanDetailTagihan submodel ->
             DetailTagihan.view sesi submodel
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifRoot
                 |> Html.map DetailTagihanMsg
 
         LamanKeluar ->
             Html.text "keluar"
-                |> Bingkai.bingkai sesi.pengguna
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifRoot
 
 
 init : Decode.Value -> Location -> ( Model, Cmd Msg )
