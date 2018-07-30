@@ -5,7 +5,6 @@ import Data.Pelanggan as Pelanggan
 import Data.Sesi as Sesi
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Attributes exposing (..)
 import Http as Http
 import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
@@ -39,12 +38,15 @@ init sesi =
 
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
-    div [ class "container" ]
+    div [ class "content" ]
         [ h1 [ class "header" ]
             [ p [ class "header" ]
-                [ text "Daftar Pelanggan" ]
+                [ text "Daftar Pelanggan"
+                , a [ Rute.href Rute.TambahPelanggan, class "button is-pulled-right is-info" ]
+                    [ text "Tambah Pelanggan" ]
+                ]
             ]
-        , table [ class "table" ]
+        , table [ class "table is-stripped is-fullwidth" ]
             [ thead [ class "thead" ]
                 [ tr [ class "tr" ]
                     [ th [ class "th" ] [ text "Nama" ]

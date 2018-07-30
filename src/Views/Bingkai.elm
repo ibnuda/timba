@@ -12,6 +12,7 @@ bingkai mpengguna konten =
     --  div [ class "container is-fluid" ]
     lihatIsi mpengguna konten
 
+
 lihatIsi : Maybe Pengguna.Pengguna -> Html msg -> Html msg
 lihatIsi mpengguna konten =
     case mpengguna of
@@ -43,12 +44,15 @@ navigasibar =
                 [ span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
+                , span [ ariaHidden True ] []
                 ]
             ]
         , div [ id "navMenu", class "navbar-menu" ]
             [ div [ class "navbar-start" ]
                 [ a [ Rute.href Rute.DaftarPelanggan, class "navbar-item" ]
                     [ text "Pelanggan" ]
+                , a [ Rute.href Rute.TambahPelanggan, class "navbar-item" ]
+                    [ text "Tambah Pelanggan" ]
                 , a [ Rute.href Rute.DaftarTarif, class "navbar-item" ]
                     [ text "Tarif" ]
                 ]

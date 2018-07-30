@@ -13,6 +13,7 @@ import Laman.GagalMuat as GagalMuat
 import Laman.Ikhtisar as Ikhtisar
 import Laman.Masuk as Masuk
 import Laman.RiwayatPelanggan as RiwayatPelanggan
+import Laman.TambahPelanggan as TambahPelanggan
 import Navigation exposing (Location)
 import Ports
 import Task
@@ -26,6 +27,7 @@ type ModelLamanTermuat
     | LamanMasuk Masuk.Model
     | LamanIkhtisar Ikhtisar.Model
     | LamanDaftarPelanggan DaftarPelanggan.Model
+    | LamanTambahPelanggan TambahPelanggan.Model
     | LamanDaftarTarif DaftarTarif.Model
     | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanDetailTagihan DetailTagihan.Model
@@ -50,6 +52,7 @@ type Msg
     | SetPengguna (Maybe Pengguna.Pengguna)
     | MasukMsg Masuk.Msg
     | DaftarPelangganMsg DaftarPelanggan.Msg
+    | TambahPelangganMsg TambahPelanggan.Msg
     | DaftarTarifMsg DaftarTarif.Msg
     | DetailTagihanMsg DetailTagihan.Msg
     | RiwayatPelangganMsg RiwayatPelanggan.Msg
@@ -91,6 +94,10 @@ setRute mrute model =
 
         ( Just p, Just Rute.DaftarPelanggan ) ->
             transisi DaftarPelangganTermuat (DaftarPelanggan.init model.sesi)
+
+        ( Just p, Just Rute.TambahPelanggan ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanTambahPelanggan TambahPelanggan.initmodel) }
+                => Cmd.none
 
         ( Just p, Just Rute.DaftarTarif ) ->
             transisi DaftarTarifTermuat (DaftarTarif.init model.sesi)
@@ -161,6 +168,22 @@ updateLaman laman msg model =
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanMasuk modellaman) }
                 => Cmd.map MasukMsg cmd
 
+        ( TambahPelangganMsg submsg, LamanTambahPelanggan submod ) ->
+            let
+                ( ( modellaman, cmd ), msgdarilaman ) =
+                    TambahPelanggan.update sesi submsg submod
+
+                modelbaru =
+                    case msgdarilaman of
+                        TambahPelanggan.NoOp ->
+                            model
+
+                        TambahPelanggan.PelangganSelesaiDitambahkan p ->
+                            model
+            in
+            { modelbaru | kondisilaman = LamanSudahDimuat (LamanTambahPelanggan modellaman) }
+                => Cmd.map TambahPelangganMsg cmd
+
         ( DaftarTarifMsg submsg, LamanDaftarTarif submod ) ->
             let
                 ( ( modellaman, cmd ), msgdarilaman ) =
@@ -177,10 +200,6 @@ updateLaman laman msg model =
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanDaftarTarif modellaman) }
                 => Cmd.map DaftarTarifMsg cmd
 
-        ( DaftarPelangganTermuat (Err g), _ ) ->
-            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
-                => Cmd.none
-
         ( IkhtisarTermuat (Ok i), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanIkhtisar i) }
                 => Cmd.none
@@ -191,6 +210,10 @@ updateLaman laman msg model =
 
         ( DaftarPelangganTermuat (Ok dp), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanDaftarPelanggan dp) }
+                => Cmd.none
+
+        ( DaftarPelangganTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
         ( DetailPelangganTermuat (Err g), _ ) ->
@@ -288,6 +311,11 @@ viewLaman sesi laman =
             DaftarPelanggan.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna
                 |> Html.map DaftarPelangganMsg
+
+        LamanTambahPelanggan submodel ->
+            TambahPelanggan.view sesi submodel
+                |> Bingkai.bingkai sesi.pengguna
+                |> Html.map TambahPelangganMsg
 
         LamanDaftarTarif submodel ->
             DaftarTarif.view sesi submodel

@@ -91,7 +91,7 @@ view sesi model =
 
 viewdaftartarif : List Tarif.Tarif -> Html Msg
 viewdaftartarif daftartarif =
-    table [ class "table" ]
+    table [ class "table is-stripped" ]
         [ thead [ class "thead" ]
             [ tr [ class "tr" ]
                 [ th [ class "th" ] [ text "Biaya Beban" ]
@@ -157,7 +157,7 @@ viewborangtarifbaru =
             , placeholder "Tarif Selanjutnya Harga"
             ]
             []
-        , button [ class "button is-link" ]
+        , button [ class "button is-link is-pulled-right" ]
             [ text "Simpan"
             ]
         ]
