@@ -170,18 +170,10 @@ updateLaman laman msg model =
 
         ( TambahPelangganMsg submsg, LamanTambahPelanggan submod ) ->
             let
-                ( ( modellaman, cmd ), msgdarilaman ) =
+                ( modellaman, cmd ) =
                     TambahPelanggan.update sesi submsg submod
-
-                modelbaru =
-                    case msgdarilaman of
-                        TambahPelanggan.NoOp ->
-                            model
-
-                        TambahPelanggan.PelangganSelesaiDitambahkan p ->
-                            model
             in
-            { modelbaru | kondisilaman = LamanSudahDimuat (LamanTambahPelanggan modellaman) }
+            { model | kondisilaman = LamanSudahDimuat (LamanTambahPelanggan modellaman) }
                 => Cmd.map TambahPelangganMsg cmd
 
         ( DaftarTarifMsg submsg, LamanDaftarTarif submod ) ->
