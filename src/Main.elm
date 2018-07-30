@@ -3,6 +3,7 @@ module Main exposing (main)
 import DaftarRute as Rute
 import Data.Pengguna as Pengguna
 import Data.Sesi exposing (Sesi)
+import Data.Tagihan.Tarif as Tarif
 import Html exposing (..)
 import Json.Decode as Decode
 import Laman.DaftarPelanggan as DaftarPelanggan
@@ -40,6 +41,7 @@ type KondisiLaman
 type alias Model =
     { sesi : Sesi
     , kondisilaman : KondisiLaman
+    , tariftersimpan : List Tarif.Tarif
     }
 
 
@@ -94,10 +96,12 @@ setRute mrute model =
             transisi DaftarTarifTermuat (DaftarTarif.init model.sesi)
 
         ( Just p, Just (Rute.DetailPelanggan nomormeteran) ) ->
-            transisi DetailPelangganTermuat (RiwayatPelanggan.init model.sesi nomormeteran)
+            transisi DetailPelangganTermuat
+                (RiwayatPelanggan.init model.sesi nomormeteran)
 
         ( Just p, Just (Rute.DetailTagihan nomet tahun bulan) ) ->
-            transisi DetailTagihanTermuat (DetailTagihan.init model.sesi nomet tahun bulan)
+            transisi DetailTagihanTermuat
+                (DetailTagihan.init model.sesi nomet tahun bulan)
 
         ( Just p, Just Rute.Keluar ) ->
             let
@@ -125,6 +129,9 @@ updateLaman laman msg model =
     let
         sesi =
             model.sesi
+
+        tersimpan =
+            model.tariftersimpan
 
         kelaman kemodel kemsg subupd submsg submod =
             let
@@ -154,6 +161,22 @@ updateLaman laman msg model =
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanMasuk modellaman) }
                 => Cmd.map MasukMsg cmd
 
+        ( DaftarTarifMsg submsg, LamanDaftarTarif submod ) ->
+            let
+                ( ( modellaman, cmd ), msgdarilaman ) =
+                    DaftarTarif.update model.sesi submsg submod
+
+                modelbaru =
+                    case msgdarilaman of
+                        DaftarTarif.NoOp ->
+                            model
+
+                        DaftarTarif.SetTarifMsg x ->
+                            { model | tariftersimpan = tersimpan ++ [ x ] }
+            in
+            { modelbaru | kondisilaman = LamanSudahDimuat (LamanDaftarTarif modellaman) }
+                => Cmd.map DaftarTarifMsg cmd
+
         ( DaftarPelangganTermuat (Err g), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
@@ -174,8 +197,19 @@ updateLaman laman msg model =
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
-        ( DaftarTarifTermuat (Ok dp), _ ) ->
-            { model | kondisilaman = LamanSudahDimuat (LamanDaftarTarif dp) }
+        ( DaftarTarifTermuat (Ok dt), _ ) ->
+            let
+                tarif =
+                    DaftarTarif.modelketarif dt
+
+                pengguna =
+                    model.sesi.pengguna
+            in
+            { model
+                | kondisilaman = LamanSudahDimuat (LamanDaftarTarif dt)
+                , tariftersimpan = tersimpan ++ [ tarif ]
+                , sesi = { sesi | pengguna = pengguna }
+            }
                 => Cmd.none
 
         ( DaftarTarifTermuat (Err g), _ ) ->
@@ -280,6 +314,7 @@ init v l =
     setRute (Rute.dariLokasi l)
         { kondisilaman = LamanSudahDimuat LamanKosong
         , sesi = { pengguna = decodePenggunaJson v }
+        , tariftersimpan = []
         }
 
 

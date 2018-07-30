@@ -82,7 +82,7 @@ view sesi model =
                 ]
             , div [ class "column is-one-third" ]
                 [ h2 [ class "header" ]
-                    [ text "Tambah Tarif"]
+                    [ text "Tambah Tarif" ]
                 , viewborangtarifbaru
                 ]
             ]
@@ -163,8 +163,8 @@ viewborangtarifbaru =
         ]
 
 
-update : Msg -> Model -> ( ( Model, Cmd Msg ), EksternalMsg )
-update msg model =
+update : Sesi.Sesi -> Msg -> Model -> ( ( Model, Cmd Msg ), EksternalMsg )
+update sesi msg model =
     let
         dt =
             model.daftartarif
@@ -192,7 +192,7 @@ update msg model =
             case validate validator model of
                 [] ->
                     { model | galat = [] }
-                        => Http.send BuatTarifSelesai (kirimmodel model)
+                        => Http.send BuatTarifSelesai (kirimmodel sesi model)
                         => NoOp
 
                 x ->
@@ -231,8 +231,35 @@ update msg model =
                 => NoOp
 
 
-kirimmodel : { a | akhirharga : String, awalharga : String, awalsampai : String, biayabeban : String, tengahharga : String, tengahsampai : String } -> Http.Request Tarif.Tarif
-kirimmodel model =
+kirimmodel : Sesi.Sesi -> Model -> Http.Request Tarif.Tarif
+kirimmodel sesi model =
+    let
+        mtoken =
+            Maybe.map .token sesi.pengguna
+
+        a =
+            paksa model.biayabeban
+
+        b =
+            paksa model.awalharga
+
+        c =
+            paksa model.awalsampai
+
+        d =
+            paksa model.tengahharga
+
+        e =
+            paksa model.tengahsampai
+
+        f =
+            paksa model.akhirharga
+    in
+    LihatIkhtisar.postTarif mtoken a b c d e f
+
+
+modelketarif : Model -> Tarif.Tarif
+modelketarif model =
     let
         a =
             paksa model.biayabeban
@@ -252,4 +279,4 @@ kirimmodel model =
         f =
             paksa model.akhirharga
     in
-    LihatIkhtisar.postTarif a b c d e f
+    { biayabeban = a, hargaawal = b, sampaiawal = c, hargatengah = d, sampaitengah = e, hargaakhir = f }

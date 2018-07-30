@@ -38,7 +38,8 @@ getDaftarTarif mtoken =
         |> HttpBuilder.toRequest
 
 
-postTarif a b c d e f =
+postTarif : Maybe AuthToken -> Int -> Int -> Int -> Int -> Int -> Int -> Http.Request Tarif.Tarif
+postTarif mtoken a b c d e f =
     let
         tarif =
             Encode.object
@@ -49,7 +50,13 @@ postTarif a b c d e f =
                 , "tengah_sampai" => Encode.int e
                 , "akhir_harga" => Encode.int f
                 ]
-                |> Http.jsonBody
+
+        expect =
+            Tarif.decoderTarif |> Http.expectJson
     in
-    Tarif.decoderTarif
-        |> Http.post (apiUrl "/tarif") tarif
+    apiUrl "/tarif"
+        |> HttpBuilder.post
+        |> HttpBuilder.withExpect expect
+        |> HttpBuilder.withJsonBody tarif
+        |> withAuthorization mtoken
+        |> HttpBuilder.toRequest
