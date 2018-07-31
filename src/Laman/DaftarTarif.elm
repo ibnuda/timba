@@ -157,7 +157,7 @@ viewborangtarifbaru =
             , placeholder "Tarif Selanjutnya Harga"
             ]
             []
-        , button [ class "button is-link is-pulled-right" ]
+        , button [ class "button is-primary is-pulled-right" ]
             [ text "Simpan"
             ]
         ]

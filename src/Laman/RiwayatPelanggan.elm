@@ -46,19 +46,47 @@ view _ model =
 
 viewdetail : DPelanggan.DetailPelanggan -> Html msg
 viewdetail dp =
-    div []
-        [ div []
-            [ p [] [ text <| "Nama: " ++ dp.namaPelanggan ]
-            , p [] [ text <| "Nomor Meteran: " ++ dp.nomorMeteran ]
+    div [ class "columns" ]
+        [ div [ class "column" ]
+            [ div [ class "card" ]
+                [ header [ class "header" ]
+                    [ p [ class "card-header-title" ]
+                        [ text "Informasi Pengguna" ]
+                    ]
+                , div [ class "card-content" ]
+                    [ div [ class "content" ]
+                        [ viewinfopengguna "Nama" dp.namaPelanggan
+                        , viewinfopengguna "Nomor Telepon" dp.nomorTelepon
+                        , viewinfopengguna "Wilayah" dp.wilayah
+                        , viewinfopengguna "Alamat" dp.alamat
+                        ]
+                    ]
+                ]
             ]
-        , div []
-            [ p [] [ text <| "Nomor Telepon: " ++ dp.wilayah ]
-            , p [] [ text <| "Alamat: " ++ dp.alamat ]
+        , div [ class "column" ]
+            [ div [ class "card" ]
+                [ header [ class "header" ]
+                    [ p [ class "card-header-title" ]
+                        [ text "Informasi Pengguna" ]
+                    ]
+                , div [ class "card-content" ]
+                    [ div [ class "content" ]
+                        [ viewinfopengguna "Nomor Meteran" dp.nomorMeteran
+                        , viewinfopengguna "Tanggal Daftar" dp.tanggalDaftar
+                        ]
+                    ]
+                ]
             ]
-        , div []
-            [ p [] [ text <| "Tanggal Daftar: " ++ dp.tanggalDaftar ]
-            , p [] [ text <| "Nomor Telepon: " ++ dp.nomorTelepon ]
-            ]
+        ]
+
+
+viewinfopengguna : String -> String -> Html msg
+viewinfopengguna detail info =
+    div [ class "columns" ]
+        [ div [ class "column" ]
+            [ p [] [ text <| detail ++ ": " ] ]
+        , div [ class "column" ]
+            [ p [] [ text info ] ]
         ]
 
 

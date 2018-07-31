@@ -137,12 +137,13 @@ kirimPelanggan sesi model =
 
 view : Sesi.Sesi -> Model -> Html Msg
 view sesi model =
-    div [ class "container" ]
+    div [ class "content" ]
         [ div [ class "columns" ]
             [ div [ class "column is-one-fifth" ]
                 []
             , div [ class "column auto" ]
-                [ Borang.viewGalat model.galat
+                [ h2 [ class "header" ] [ text "Tambah Pelanggan" ]
+                , Borang.viewGalat model.galat
                 , viewborangpenggunabaru
                 ]
             , div [ class "column is-one-fifth" ]
@@ -190,7 +191,7 @@ viewborangpenggunabaru =
             , placeholder "NomorMeteran"
             ]
             []
-        , button [ class "button is-link is-pulled-right" ]
+        , button [ class "button is-primary is-pulled-right" ]
             [ text "Tambah"
             ]
         ]
