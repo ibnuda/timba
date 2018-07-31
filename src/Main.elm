@@ -10,6 +10,7 @@ import Laman.DaftarPelanggan as DaftarPelanggan
 import Laman.DaftarTarif as DaftarTarif
 import Laman.DetailTagihan as DetailTagihan
 import Laman.GagalMuat as GagalMuat
+import Laman.Ganti as Ganti
 import Laman.Ikhtisar as Ikhtisar
 import Laman.Masuk as Masuk
 import Laman.RiwayatPelanggan as RiwayatPelanggan
@@ -31,6 +32,7 @@ type ModelLamanTermuat
     | LamanDaftarTarif DaftarTarif.Model
     | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanDetailTagihan DetailTagihan.Model
+    | LamanGantiInformasi Ganti.Model
     | LamanKeluar
     | LamanGagalMuat GagalMuat.LamanGagalDimuat
 
@@ -109,6 +111,10 @@ setRute mrute model =
         ( Just p, Just (Rute.DetailTagihan nomet tahun bulan) ) ->
             transisi DetailTagihanTermuat
                 (DetailTagihan.init model.sesi nomet tahun bulan)
+
+        ( Just p, Just Rute.GantiInformasi ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGantiInformasi <| Ganti.init model.sesi) }
+                => Cmd.none
 
         ( Just p, Just Rute.Keluar ) ->
             let
@@ -323,6 +329,10 @@ viewLaman sesi laman =
             DetailTagihan.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna Bingkai.AktifRoot
                 |> Html.map DetailTagihanMsg
+
+        LamanGantiInformasi submodel ->
+            Ganti.view sesi submodel
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifGanti
 
         LamanKeluar ->
             Html.text "keluar"

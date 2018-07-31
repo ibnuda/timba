@@ -6,6 +6,7 @@ import Data.Tagihan as Tagihan
 import Data.Tagihan.Tarif as Tarif
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Aria exposing (..)
 import Http as Http
 import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
@@ -46,41 +47,92 @@ view _ model =
 
 viewTagihan : Tagihan.Tagihan -> Html msg
 viewTagihan tagihan =
-    div []
-        [ a [ Rute.href (Rute.DetailPelanggan tagihan.nomorMeteran) ]
-            [ text "Kembali" ]
-        , h1 [] [ text "Tagihan Minum" ]
-        , p [] [ text <| "Nomor Meteran: " ++ tagihan.nomorMeteran ]
-        , p [] [ text <| "Tahun : " ++ toString tagihan.tahun ++ " Bulan " ++ toString tagihan.bulan ]
-        , p [] [ text <| "Tanggal Bayar : " ++ tagihan.tanggalBayar ]
-        , p [] [ text <| "Minum: " ++ toString (tagihan.minumSekarang - tagihan.minumLalu) ]
-        , viewPelanggan tagihan.pengguna
-        , viewTarif tagihan.tarif
+    div [ class "container" ]
+        [ nav [ class "breadcrumb", ariaLabel "breadcrumbs" ]
+            [ ul []
+                [ li [] [ a [ Rute.href Rute.Beranda ] [ text "Beranda" ] ]
+                , li [] [ a [ Rute.href Rute.DaftarPelanggan ] [ text "Daftar Pelanggan" ] ]
+                , li []
+                    [ a
+                        [ Rute.href (Rute.DetailPelanggan tagihan.nomorMeteran)
+                        , class "is-active"
+                        , attribute "aria-current" "page"
+                        ]
+                        [ text tagihan.pengguna.namaPelanggan ]
+                    ]
+                ]
+            ]
+        , div [ class "columns" ]
+            [ viewpelanggan tagihan.pengguna
+            , viewtagihan tagihan
+            ]
+        , viewtarif tagihan.tarif
         ]
 
 
-viewPelanggan : Tagihan.TagihanPelanggan -> Html msg
-viewPelanggan pelanggan =
-    div []
-        [ p [] [ text <| "Nama Pelanggan: " ++ pelanggan.namaPelanggan ]
-        , p [] [ text <| "Nomor Telepon: " ++ pelanggan.nomorTelepon ]
-        , p [] [ text <| "Alamat: " ++ pelanggan.alamat ]
-        , p [] [ text <| "Wilayah: " ++ pelanggan.wilayah ]
+viewpelanggan : Tagihan.TagihanPelanggan -> Html msg
+viewpelanggan pelanggan =
+    div [ class "column" ]
+        [ table [ class "table is-stripped" ]
+            [ viewbaristabel "Nama Pelanggan" pelanggan.namaPelanggan
+            , viewbaristabel "Nomor Telepon" pelanggan.nomorTelepon
+            , viewbaristabel "Alamat" pelanggan.alamat
+            , viewbaristabel "Wilayah" pelanggan.wilayah
+            ]
         ]
 
 
-viewTarif : Tarif.Tarif -> Html msg
-viewTarif tarif =
-    div []
-        [ p [] [ text <| "Biaya Beban :" ++ toString tarif.biayabeban ]
-        , div [ class "" ]
-            [ p [] [ text "Mulai: 0" ]
-            , p [] [ text <| "Sampai: " ++ toString tarif.hargaawal ]
-            , p [] [ text <| "Harga: " ++ toString tarif.sampaiawal ]
-            , p [] [ text <| "Mulai: " ++ toString tarif.sampaiawal ]
-            , p [] [ text <| "Harga: " ++ toString tarif.hargatengah ]
-            , p [] [ text <| "Mulai: " ++ toString tarif.sampaitengah ]
-            , p [] [ text <| "Harga: " ++ toString tarif.hargaakhir ]
+viewtagihan : Tagihan.Tagihan -> Html msg
+viewtagihan tagihan =
+    let
+        minum =
+            toString <| tagihan.minumSekarang - tagihan.minumLalu
+    in
+    div [ class "column" ]
+        [ table [ class "table" ]
+            [ viewbaristabel "Nomor Meteran" tagihan.nomorMeteran
+            , viewbaristabel "Tanggal Tagihan" <| toString tagihan.tahun ++ " Bulan " ++ toString tagihan.bulan
+            , viewbaristabel "Penggunaan Air" <| minum ++ " M3"
+            ]
+        ]
+
+
+viewbaristabel : String -> String -> Html msg
+viewbaristabel d i =
+    tr [ class "tr" ]
+        [ th [ class "th is-narrow" ] [ text d ]
+        , td [ class "td" ] [ text i ]
+        ]
+
+
+viewbagian : String -> String -> String -> Html msg
+viewbagian detail info satuan =
+    div [ class "columns" ]
+        [ div [ class "column" ]
+            [ p [] [ text <| detail ++ ":" ] ]
+        , div [ class "column" ]
+            [ p [] [ text <| info ++ " " ++ satuan ] ]
+        ]
+
+
+viewtarif : Tarif.Tarif -> Html msg
+viewtarif tarif =
+    div [ class "tile is-ancestor" ]
+        [ div [ class "tile is-parent" ]
+            [ div [ class "tile is-child is-4 box" ]
+                [ viewbagian "Mulai" "0" "M3"
+                , viewbagian "Sampai" (toString tarif.sampaiawal) "M3"
+                , viewbagian "Harga" (toString tarif.hargaawal) "Rp"
+                ]
+            , div [ class "tile is-child is-4 box" ]
+                [ viewbagian "Mulai" (toString tarif.sampaiawal) "M3"
+                , viewbagian "Sampai" (toString tarif.sampaitengah) "M3"
+                , viewbagian "Harga" (toString tarif.hargatengah) "Rp"
+                ]
+            , div [ class "tile is-child is-4 box" ]
+                [ viewbagian "Mulai" (toString tarif.sampaitengah) "M3"
+                , viewbagian "Harga" (toString tarif.hargaakhir) "Rp"
+                ]
             ]
         ]
 
