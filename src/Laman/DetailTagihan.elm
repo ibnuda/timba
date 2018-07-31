@@ -66,7 +66,7 @@ viewTagihan tagihan =
             [ viewpelanggan tagihan.pengguna
             , viewtagihan tagihan
             ]
-        , viewtarif tagihan.tarif
+        , viewtariflagi tagihan.tarif (tagihan.minumSekarang - tagihan.minumLalu)
         ]
 
 
@@ -105,33 +105,67 @@ viewbaristabel d i =
         ]
 
 
-viewbagian : String -> String -> String -> Html msg
-viewbagian detail info satuan =
-    div [ class "columns" ]
-        [ div [ class "column" ]
-            [ p [] [ text <| detail ++ ":" ] ]
-        , div [ class "column" ]
-            [ p [] [ text <| info ++ " " ++ satuan ] ]
-        ]
+dikurangiataunol : Int -> Int -> Int -> Int
+dikurangiataunol mulai sampai penggunaan =
+    if mulai > penggunaan then
+        0
+    else if penggunaan > sampai then
+        sampai - mulai
+    else
+        penggunaan - sampai
 
 
-viewtarif : Tarif.Tarif -> Html msg
-viewtarif tarif =
-    div [ class "tile is-ancestor" ]
-        [ div [ class "tile is-parent" ]
-            [ div [ class "tile is-child is-4 box" ]
-                [ viewbagian "Mulai" "0" "M3"
-                , viewbagian "Sampai" (toString tarif.sampaiawal) "M3"
-                , viewbagian "Harga" (toString tarif.hargaawal) "Rp"
+selisihataunol : Int -> Int -> Int
+selisihataunol mulai penggunaan =
+    if mulai > penggunaan then
+        0
+    else
+        penggunaan - mulai
+
+
+viewtariflagi : Tarif.Tarif -> Int -> Html msg
+viewtariflagi tarif penggunaan =
+    let
+        gunaawal =
+            dikurangiataunol 0 tarif.sampaiawal penggunaan
+
+        gunatengah =
+            dikurangiataunol tarif.sampaiawal tarif.sampaitengah penggunaan
+
+        gunaakhir =
+            selisihataunol tarif.sampaitengah penggunaan
+    in
+    div [ class "content" ]
+        [ table [ class "table" ]
+            [ thead [ class "thead" ]
+                [ th [ class "th" ] [ text "Mulai" ]
+                , th [ class "th" ] [ text "Sampai" ]
+                , th [ class "th" ] [ text "Harga" ]
+                , th [ class "th" ] [ text "Penggunaan" ]
+                , th [ class "th" ] [ text "Bayar" ]
                 ]
-            , div [ class "tile is-child is-4 box" ]
-                [ viewbagian "Mulai" (toString tarif.sampaiawal) "M3"
-                , viewbagian "Sampai" (toString tarif.sampaitengah) "M3"
-                , viewbagian "Harga" (toString tarif.hargatengah) "Rp"
-                ]
-            , div [ class "tile is-child is-4 box" ]
-                [ viewbagian "Mulai" (toString tarif.sampaitengah) "M3"
-                , viewbagian "Harga" (toString tarif.hargaakhir) "Rp"
+            , tbody [ class "tbody" ]
+                [ tr [ class "tr" ]
+                    [ td [ class "td" ] [ text "0 M3" ]
+                    , td [ class "td" ] [ text <| toString tarif.sampaiawal ++ " M3" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargaawal ]
+                    , td [ class "td" ] [ text <| toString gunaawal ++ " M3" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString (gunaawal * tarif.hargaawal) ]
+                    ]
+                , tr [ class "tr" ]
+                    [ td [ class "td" ] [ text <| toString tarif.sampaiawal ++ " M3" ]
+                    , td [ class "td" ] [ text <| toString tarif.sampaitengah ++ " M3" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargatengah ]
+                    , td [ class "td" ] [ text <| toString gunatengah ++ " M3" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString (gunatengah * tarif.hargatengah) ]
+                    ]
+                , tr [ class "tr" ]
+                    [ td [ class "td" ] [ text <| toString tarif.sampaitengah ++ " M3" ]
+                    , td [ class "td" ] [ text "-" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargaakhir ]
+                    , td [ class "td" ] [ text <| toString gunaakhir ++ " M3" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString (gunaakhir * tarif.hargaakhir) ]
+                    ]
                 ]
             ]
         ]
