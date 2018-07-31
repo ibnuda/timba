@@ -45,22 +45,29 @@ lihatIsi mpengguna laman konten =
 
 navigasibar : LamanAktif -> Html msg
 navigasibar laman =
-    nav [ class "navbar is-blue", role "navigation", ariaLabel "main navigation" ]
+    nav [ class "navbar is-primary", role "navigation", ariaLabel "main navigation" ]
         [ div [ class "navbar-brand" ]
             [ a [ Rute.href Rute.Beranda, class "navbar-item brand-text" ]
                 [ text "Timba" ]
-            , a [ role "button", class "navbar-burger is-active", ariaLabel "menu", ariaExpanded "true" ]
+            , span
+                [ role "button"
+                , attribute "data-target" "navMenu"
+                , attribute "onclick" "jaran()"
+                , class "navbar-burger burger"
+                , ariaLabel "menu"
+                , ariaExpanded "true"
+                ]
                 [ span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 ]
             ]
-        , div [ id "navMenu", class "navbar-menu is-active" ]
+        , div [ id "navMenu", class "navbar-menu" ]
             [ div [ class "navbar-start" ]
-                [ tautannavbar laman Rute.DaftarPelanggan (a [ Rute.href Rute.DaftarPelanggan ] [ text "Pelanggan" ])
-                , tautannavbar laman Rute.TambahPelanggan (a [ Rute.href Rute.TambahPelanggan ] [ text "Tambah Pelanggan" ])
-                , tautannavbar laman Rute.DaftarTarif (a [ Rute.href Rute.DaftarTarif ] [ text "Daftar Tarif" ])
+                [ tautannavbar laman Rute.DaftarPelanggan [ text "Pelanggan" ]
+                , tautannavbar laman Rute.TambahPelanggan [ text "Tambah Pelanggan" ]
+                , tautannavbar laman Rute.DaftarTarif [ text "Daftar Tarif" ]
                 ]
             , div [ class "navbar-end" ]
                 [ a [ Rute.href Rute.Keluar, class "navbar-item" ]
@@ -72,10 +79,16 @@ navigasibar laman =
         ]
 
 
-tautannavbar : LamanAktif -> Rute -> Html msg -> Html msg
+tautannavbar : LamanAktif -> Rute -> List (Html msg) -> Html msg
 tautannavbar laman rute konten =
-    div [ classList [ ( "navbar-item", True ), ( "is-active", isactive laman rute ) ] ]
-        [ konten ]
+    a
+        [ Rute.href rute
+        , classList
+            [ ( "navbar-item", True )
+            , ( "is-active", isactive laman rute )
+            ]
+        ]
+        konten
 
 
 isactive : LamanAktif -> Rute -> Bool

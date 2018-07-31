@@ -138,7 +138,7 @@ viewBorang =
             , placeholder "Sandi"
             ]
             []
-        , button [ class "button is-link is-pulled-right" ]
+        , button [ class "button is-primary is-pulled-right" ]
             [ text "Masuk"
             ]
         ]

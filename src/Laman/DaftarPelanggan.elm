@@ -42,7 +42,7 @@ view _ model =
         [ h1 [ class "header" ]
             [ p [ class "header" ]
                 [ text "Daftar Pelanggan"
-                , a [ Rute.href Rute.TambahPelanggan, class "button is-pulled-right is-info" ]
+                , a [ Rute.href Rute.TambahPelanggan, class "button is-pulled-right is-primary" ]
                     [ text "Tambah Pelanggan" ]
                 ]
             ]
