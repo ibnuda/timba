@@ -30,6 +30,15 @@ init sesi =
     }
 
 
+initmodel : Model
+initmodel =
+    { galat = []
+    , passwordlama = ""
+    , passwordbaru = ""
+    , passwordbaruvalid = ""
+    }
+
+
 type Msg
     = AjukanBorangGanti
     | SetPasswordLama String
@@ -51,7 +60,7 @@ view sesi model =
             , div [ class "column" ]
                 [ header [ class "title" ]
                     [ text "Ganti Password" ]
-                , ul [ ] <| List.map (\a -> li [] [ text a]) model.galat
+                , ul [] <| List.map (\a -> li [] [ text a ]) model.galat
                 , Html.form [ onSubmit AjukanBorangGanti ]
                     [ Borang.password
                         [ class "input"
@@ -104,48 +113,48 @@ modelkeerror model =
 
 
 update : Sesi.Sesi -> Msg -> Model -> ( ( Model, Cmd Msg ), EksternalMsg )
-update sesi msg model =
+update sesi msg mdl =
     case msg of
         SetPasswordLama s ->
-            { model | passwordlama = s }
+            { mdl | passwordlama = s }
                 => Cmd.none
                 => NoOp
 
         SetPasswordBaru s ->
-            { model | passwordbaru = s }
+            { mdl | passwordbaru = s }
                 => Cmd.none
                 => NoOp
 
         SetPasswordBaruValid s ->
-            case validate validasiulang model of
+            case validate validasiulang mdl of
                 [] ->
-                    { model | passwordbaruvalid = s }
+                    { mdl | passwordbaruvalid = s }
                         => Cmd.none
                         => NoOp
 
                 x ->
-                    { model | passwordbaruvalid = s, galat = x }
+                    { mdl | passwordbaruvalid = s, galat = Debug.log "setpas" x }
                         => Cmd.none
                         => NoOp
 
         AjukanBorangGanti ->
-            case validate validasimodel model of
+            case validate validasimodel mdl of
                 [] ->
                     let
                         mtoken =
                             Maybe.map .token sesi.pengguna
                     in
-                    { model | galat = [] }
-                        => Http.send GantiSelesai (KeluarMasuk.gantiPassword mtoken model)
+                    { mdl | galat = [] }
+                        => Http.send GantiSelesai (KeluarMasuk.gantiPassword mtoken mdl)
                         => NoOp
 
                 x ->
-                    { model | galat = x }
+                    { mdl | galat = x }
                         => Cmd.none
                         => NoOp
 
         GantiSelesai (Ok pengguna) ->
-            { model | galat = [], passwordlama = "", passwordbaru = "", passwordbaruvalid = "" }
+            mdl
                 => Cmd.none
                 => SetPenggunaMsg pengguna
 
@@ -170,6 +179,6 @@ update sesi msg model =
                         Http.NetworkError ->
                             "cek sambungan internet."
             in
-            { model | galat = [ pesangalat ] }
+            { mdl | galat = [ pesangalat ] }
                 => Cmd.none
                 => NoOp

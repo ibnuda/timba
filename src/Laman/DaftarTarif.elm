@@ -60,7 +60,7 @@ type EksternalMsg
     | SetTarifMsg Tarif.Tarif
 
 
-validator : Validator String { a | akhirharga : String, awalharga : String, awalsampai : String, biayabeban : String, tengahharga : String, tengahsampai : String }
+validator : Validator String Model
 validator =
     Validate.all
         [ ifNotInt .awalharga (\_ -> "Harga awal harus angka.")

@@ -115,7 +115,7 @@ setRute mrute model =
                 (DetailTagihan.init model.sesi nomet tahun bulan)
 
         ( Just p, Just Rute.GantiInformasi ) ->
-            { model | kondisilaman = LamanSudahDimuat (LamanGantiInformasi <| Ganti.init model.sesi) }
+            { model | kondisilaman = LamanSudahDimuat (LamanGantiInformasi Ganti.initmodel) }
                 => Cmd.none
 
         ( Just p, Just Rute.Keluar ) ->
@@ -205,7 +205,7 @@ updateLaman laman msg model =
                         Ganti.SetPenggunaMsg p ->
                             { model | sesi = { sesi | pengguna = Just p } }
             in
-            { modelbaru | kondisilaman = LamanSudahDimuat (LamanGantiInformasi submod) }
+            { modelbaru | kondisilaman = LamanSudahDimuat (LamanGantiInformasi modellaman) }
                 => Cmd.map GantiInformasiMsg cmd
 
         ( IkhtisarTermuat (Ok i), _ ) ->
@@ -278,8 +278,7 @@ updateLaman laman msg model =
             { model | sesi = { sesi | pengguna = p } } => cmd
 
         ( _, _ ) ->
-            model
-                => Cmd.none
+            model => Cmd.none
 
 
 decodePenggunaJson : Decode.Value -> Maybe Pengguna.Pengguna

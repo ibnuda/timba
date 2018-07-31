@@ -154,7 +154,7 @@ view sesi model =
 
 viewborangpenggunabaru : Html Msg
 viewborangpenggunabaru =
-    Html.form [ onSubmit AjukanBorang, class "" ]
+    Html.form [ onSubmit AjukanBorang ]
         [ Borang.input
             [ class "input"
             , onInput SetNamaPelanggan

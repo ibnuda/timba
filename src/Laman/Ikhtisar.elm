@@ -27,8 +27,13 @@ init sesi =
             LihatIkhtisar.getIkhtisar mtoken
                 |> Http.toTask
 
-        gagalpenangan _ =
-            GagalMuat.lamanGagalDimuat "gagal memuat ikhtisar."
+        gagalpenangan x =
+            case x of
+                Http.BadUrl u -> GagalMuat.lamanGagalDimuat "url kaco."
+                Http.Timeout -> GagalMuat.lamanGagalDimuat "timeout"
+                Http.NetworkError -> GagalMuat.lamanGagalDimuat "network error."
+                Http.BadStatus r -> GagalMuat.lamanGagalDimuat r.body
+                Http.BadPayload s rs -> GagalMuat.lamanGagalDimuat rs.body
     in
     Task.map (Model "") detailikhtisar
         |> Task.mapError gagalpenangan
@@ -65,18 +70,28 @@ viewkartusepertiga judul isi =
 viewtarif : Tarif.Tarif -> Html msg
 viewtarif tarif =
     div []
-        [ div [ class "column" ]
-            [ p [ class "subtitle" ]
-                [ text <| "Biaya beban: " ++ toString tarif.biayabeban ]
-            ]
-        , div [ class "" ]
-            [ p [] [ text "Mulai: 0" ]
-            , p [] [ text <| "Sampai: " ++ toString tarif.hargaawal ]
-            , p [] [ text <| "Harga: " ++ toString tarif.sampaiawal ]
-            , p [] [ text <| "Mulai: " ++ toString tarif.sampaiawal ]
-            , p [] [ text <| "Harga: " ++ toString tarif.hargatengah ]
-            , p [] [ text <| "Mulai: " ++ toString tarif.sampaitengah ]
-            , p [] [ text <| "Harga: " ++ toString tarif.hargaakhir ]
+        [ p [ class "subtitle" ]
+            [ text <| "Biaya beban: " ++ toString tarif.biayabeban ]
+        , table [ class "table" ]
+            [ thead [ class "thead" ]
+                [ th [ class "th" ] [ text "Mulai" ]
+                , th [ class "th" ] [ text "Sampai" ]
+                , th [ class "th" ] [ text "Harga" ]
+                ]
+            , tr [ class "tr" ]
+                [ td [ class "td" ] [ text "0 M3" ]
+                , td [ class "td" ] [ text <| toString tarif.sampaiawal ++ " M3" ]
+                , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargaawal ]
+                ]
+            , tr [ class "tr" ]
+                [ td [ class "td" ] [ text <| toString tarif.sampaiawal ++ " M3" ]
+                , td [ class "td" ] [ text <| toString tarif.sampaitengah ++ " M3" ]
+                , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargatengah ]
+                ]
+            , tr [ class "tr" ]
+                [ td [ class "td" ] [ text <| toString tarif.sampaitengah ++ " M3" ]
+                , td [ class "td" ] [ text "-" ]
+                , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargaakhir ]
+                ]
             ]
         ]
-

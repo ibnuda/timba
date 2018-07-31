@@ -125,7 +125,7 @@ view _ model =
 
 viewBorang : Html Msg
 viewBorang =
-    Html.form [ onSubmit AjukanBorang, class "" ]
+    Html.form [ onSubmit AjukanBorang ]
         [ Borang.input
             [ class "input"
             , onInput SetTelepon
