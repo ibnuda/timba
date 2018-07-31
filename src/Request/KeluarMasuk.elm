@@ -29,13 +29,13 @@ masuk { telepon, sandi } =
         |> Http.post (apiUrl "/masuk") pengguna
 
 
-gantiPassword : { a | passbaru : String, passlama : String } -> Maybe AuthToken -> Http.Request Pengguna
-gantiPassword { passlama, passbaru } mtoken =
+gantiPassword : Maybe AuthToken -> { a | passwordlama : String, passwordbaru : String } -> Http.Request Pengguna
+gantiPassword mtoken { passwordlama, passwordbaru } =
     let
         gantipass =
             Encode.object
-                [ "pass_lama" => Encode.string passlama
-                , "pass_baru" => Encode.string passbaru
+                [ "pass_lama" => Encode.string passwordlama
+                , "pass_baru" => Encode.string passwordbaru
                 ]
                 |> Http.jsonBody
 

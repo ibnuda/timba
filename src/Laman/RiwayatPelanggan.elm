@@ -44,55 +44,39 @@ view _ model =
         ]
 
 
+viewbaristabel : String -> String -> Html msg
+viewbaristabel d i =
+    tr [ class "tr" ]
+        [ th [ class "th is-narrow" ] [ text d ]
+        , td [ class "td" ] [ text i ]
+        ]
+
+
 viewdetail : DPelanggan.DetailPelanggan -> Html msg
 viewdetail dp =
     div [ class "columns" ]
         [ div [ class "column" ]
-            [ div [ class "card" ]
-                [ header [ class "header" ]
-                    [ p [ class "card-header-title" ]
-                        [ text "Informasi Pengguna" ]
-                    ]
-                , div [ class "card-content" ]
-                    [ div [ class "content" ]
-                        [ viewinfopengguna "Nama" dp.namaPelanggan
-                        , viewinfopengguna "Nomor Telepon" dp.nomorTelepon
-                        , viewinfopengguna "Wilayah" dp.wilayah
-                        , viewinfopengguna "Alamat" dp.alamat
-                        ]
-                    ]
+            [ p [ class "title" ] [ text "Detail Pelanggan" ]
+            , table [ class "table is-stripped table-container" ]
+                [ viewbaristabel "Nama" dp.namaPelanggan
+                , viewbaristabel "Nomor Telepon" dp.nomorTelepon
+                , viewbaristabel "Wilayah" dp.wilayah
+                , viewbaristabel "Alamat" dp.alamat
                 ]
             ]
         , div [ class "column" ]
-            [ div [ class "card" ]
-                [ header [ class "header" ]
-                    [ p [ class "card-header-title" ]
-                        [ text "Informasi Pengguna" ]
-                    ]
-                , div [ class "card-content" ]
-                    [ div [ class "content" ]
-                        [ viewinfopengguna "Nomor Meteran" dp.nomorMeteran
-                        , viewinfopengguna "Tanggal Daftar" dp.tanggalDaftar
-                        ]
-                    ]
+            [ p [ class "title" ] [ text "Detail Meteran" ]
+            , table [ class "table is-stripped table-container" ]
+                [ viewbaristabel "Nomor Meteran" dp.nomorMeteran
+                , viewbaristabel "Tanggal Daftar" dp.tanggalDaftar
                 ]
             ]
-        ]
-
-
-viewinfopengguna : String -> String -> Html msg
-viewinfopengguna detail info =
-    div [ class "columns" ]
-        [ div [ class "column" ]
-            [ p [] [ text <| detail ++ ": " ] ]
-        , div [ class "column" ]
-            [ p [] [ text info ] ]
         ]
 
 
 viewriwayat : DPelanggan.DetailPelanggan -> Html msg
 viewriwayat dp =
-    table [ class "table" ]
+    table [ class "table table-container" ]
         [ thead [ class "thead" ]
             [ tr [ class "tr" ]
                 [ th [ class "th" ] [ text "Tahun" ]

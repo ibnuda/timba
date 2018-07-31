@@ -73,7 +73,7 @@ viewTagihan tagihan =
 viewpelanggan : Tagihan.TagihanPelanggan -> Html msg
 viewpelanggan pelanggan =
     div [ class "column" ]
-        [ table [ class "table is-stripped" ]
+        [ table [ class "table is-stripped table-container" ]
             [ viewbaristabel "Nama Pelanggan" pelanggan.namaPelanggan
             , viewbaristabel "Nomor Telepon" pelanggan.nomorTelepon
             , viewbaristabel "Alamat" pelanggan.alamat
@@ -89,7 +89,7 @@ viewtagihan tagihan =
             toString <| tagihan.minumSekarang - tagihan.minumLalu
     in
     div [ class "column" ]
-        [ table [ class "table" ]
+        [ table [ class "table table-container" ]
             [ viewbaristabel "Nomor Meteran" tagihan.nomorMeteran
             , viewbaristabel "Tanggal Tagihan" <| toString tagihan.tahun ++ " Bulan " ++ toString tagihan.bulan
             , viewbaristabel "Penggunaan Air" <| minum ++ " M3"

@@ -63,12 +63,12 @@ type EksternalMsg
 validator : Validator String { a | akhirharga : String, awalharga : String, awalsampai : String, biayabeban : String, tengahharga : String, tengahsampai : String }
 validator =
     Validate.all
-        [ ifNotInt .awalharga "Harus angka."
-        , ifNotInt .awalsampai "Harus angka."
-        , ifNotInt .tengahharga "Harus angka."
-        , ifNotInt .tengahsampai "Harus angka."
-        , ifNotInt .akhirharga "Harus angka."
-        , ifNotInt .biayabeban "Harus angka."
+        [ ifNotInt .awalharga (\_ -> "Harga awal harus angka.")
+        , ifNotInt .awalsampai (\_ -> "Sampai awal harus angka.")
+        , ifNotInt .tengahharga (\_ -> "Harga tengah harus angka.")
+        , ifNotInt .tengahsampai (\_ -> "Sampai tengah harus angka.")
+        , ifNotInt .akhirharga (\_ -> "Harga akhir harus angka.")
+        , ifNotInt .biayabeban (\_ -> "Biaya beban harus angka.")
         ]
 
 
@@ -77,12 +77,12 @@ view sesi model =
     div [ class "content" ]
         [ div [ class "columns" ]
             [ div [ class "column is-two-third" ]
-                [ Borang.viewGalat model.galat
-                , viewdaftartarif model.daftartarif
+                [ viewdaftartarif model.daftartarif
                 ]
             , div [ class "column is-one-third" ]
                 [ h2 [ class "header" ]
                     [ text "Tambah Tarif" ]
+                , Borang.viewGalat model.galat
                 , viewborangtarifbaru
                 ]
             ]
@@ -91,7 +91,7 @@ view sesi model =
 
 viewdaftartarif : List Tarif.Tarif -> Html Msg
 viewdaftartarif daftartarif =
-    table [ class "table is-stripped" ]
+    table [ class "table is-stripped table-container" ]
         [ thead [ class "thead" ]
             [ tr [ class "tr" ]
                 [ th [ class "th" ] [ text "Biaya Beban" ]
@@ -120,7 +120,7 @@ viewtarifitem tarif =
 
 viewborangtarifbaru : Html Msg
 viewborangtarifbaru =
-    Html.form [ onSubmit AjukanBorang, class "" ]
+    Html.form [ onSubmit AjukanBorang ]
         [ Borang.input
             [ class "input"
             , onInput SetBiayaBeban
@@ -158,8 +158,7 @@ viewborangtarifbaru =
             ]
             []
         , button [ class "button is-primary is-pulled-right" ]
-            [ text "Simpan"
-            ]
+            [ text "Simpan" ]
         ]
 
 

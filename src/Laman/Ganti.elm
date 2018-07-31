@@ -1,50 +1,74 @@
 module Laman.Ganti exposing (..)
 
+import Data.Pengguna as Pengguna
 import Data.Sesi as Sesi
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Http as Http
+import Json.Decode as Decode
+import Request.KeluarMasuk as KeluarMasuk
+import Util exposing (..)
+import Validate exposing (Validator, firstError, fromErrors, ifBlank, validate)
 import Views.Borang as Borang
 
 
 type alias Model =
-    { galat : String
-    , nama : String
+    { galat : List String
     , passwordlama : String
     , passwordbaru : String
+    , passwordbaruvalid : String
     }
 
 
 init : Sesi.Sesi -> Model
 init sesi =
-    { galat = ""
-    , nama = ""
+    { galat = []
     , passwordlama = ""
     , passwordbaru = ""
+    , passwordbaruvalid = ""
     }
 
 
-view : Sesi.Sesi -> Model -> Html msg
+type Msg
+    = AjukanBorangGanti
+    | SetPasswordLama String
+    | SetPasswordBaru String
+    | SetPasswordBaruValid String
+    | GantiSelesai (Result Http.Error Pengguna.Pengguna)
+
+
+type EksternalMsg
+    = NoOp
+    | SetPenggunaMsg Pengguna.Pengguna
+
+
+view : Sesi.Sesi -> Model -> Html Msg
 view sesi model =
     div [ class "container" ]
         [ div [ class "columns" ]
             [ div [ class "column" ] []
             , div [ class "column" ]
                 [ header [ class "title" ]
-                    [ text "Ganti Password (belum ditulis)" ]
-                , Html.form []
-                    [ Borang.input
+                    [ text "Ganti Password" ]
+                , ul [ ] <| List.map (\a -> li [] [ text a]) model.galat
+                , Html.form [ onSubmit AjukanBorangGanti ]
+                    [ Borang.password
                         [ class "input"
-                        , placeholder "Nama"
-                        ]
-                        [ text model.nama ]
-                    , Borang.password
-                        [ class "input"
-                        , placeholder "Password Lama"
+                        , onInput SetPasswordLama
+                        , placeholder "Sandi Lama"
                         ]
                         []
                     , Borang.password
                         [ class "input"
-                        , placeholder "Password Baru"
+                        , onInput SetPasswordBaru
+                        , placeholder "Sandi Baru"
+                        ]
+                        []
+                    , Borang.password
+                        [ class "input"
+                        , onInput SetPasswordBaruValid
+                        , placeholder "Ulang Sandi Baru"
                         ]
                         []
                     , button [ class "button is-pulled-right is-primary" ]
@@ -54,3 +78,98 @@ view sesi model =
             , div [ class "column" ] []
             ]
         ]
+
+
+validasimodel : Validator String Model
+validasimodel =
+    Validate.all
+        [ ifBlank .passwordlama "Sandi lama harus diisi."
+        , ifBlank .passwordbaru "Sandi baru harus isi."
+        , ifBlank .passwordbaruvalid "Sandi baru harus isi."
+        , validasiulang
+        ]
+
+
+validasiulang : Validator String Model
+validasiulang =
+    fromErrors modelkeerror
+
+
+modelkeerror : Model -> List String
+modelkeerror model =
+    if model.passwordbaru == model.passwordbaruvalid then
+        []
+    else
+        [ "Harap mengulang kata sandi baru." ]
+
+
+update : Sesi.Sesi -> Msg -> Model -> ( ( Model, Cmd Msg ), EksternalMsg )
+update sesi msg model =
+    case msg of
+        SetPasswordLama s ->
+            { model | passwordlama = s }
+                => Cmd.none
+                => NoOp
+
+        SetPasswordBaru s ->
+            { model | passwordbaru = s }
+                => Cmd.none
+                => NoOp
+
+        SetPasswordBaruValid s ->
+            case validate validasiulang model of
+                [] ->
+                    { model | passwordbaruvalid = s }
+                        => Cmd.none
+                        => NoOp
+
+                x ->
+                    { model | passwordbaruvalid = s, galat = x }
+                        => Cmd.none
+                        => NoOp
+
+        AjukanBorangGanti ->
+            case validate validasimodel model of
+                [] ->
+                    let
+                        mtoken =
+                            Maybe.map .token sesi.pengguna
+                    in
+                    { model | galat = [] }
+                        => Http.send GantiSelesai (KeluarMasuk.gantiPassword mtoken model)
+                        => NoOp
+
+                x ->
+                    { model | galat = x }
+                        => Cmd.none
+                        => NoOp
+
+        GantiSelesai (Ok pengguna) ->
+            { model | galat = [], passwordlama = "", passwordbaru = "", passwordbaruvalid = "" }
+                => Cmd.none
+                => SetPenggunaMsg pengguna
+
+        GantiSelesai (Err r) ->
+            let
+                pesangalat =
+                    case r of
+                        Http.BadStatus r ->
+                            r.body
+                                |> Decode.decodeString (Decode.field "errors" Decode.string)
+                                |> Result.withDefault "kok bisa, ya?"
+
+                        Http.BadPayload yangsalah _ ->
+                            yangsalah
+
+                        Http.BadUrl u ->
+                            u ++ " salah."
+
+                        Http.Timeout ->
+                            "timeout."
+
+                        Http.NetworkError ->
+                            "cek sambungan internet."
+            in
+            { model | galat = [ pesangalat ] }
+                => Cmd.none
+                => NoOp

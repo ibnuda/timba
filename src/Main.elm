@@ -57,12 +57,14 @@ type Msg
     | TambahPelangganMsg TambahPelanggan.Msg
     | DaftarTarifMsg DaftarTarif.Msg
     | DetailTagihanMsg DetailTagihan.Msg
+    | GantiInformasiMsg Ganti.Msg
     | RiwayatPelangganMsg RiwayatPelanggan.Msg
     | IkhtisarTermuat (Result GagalMuat.LamanGagalDimuat Ikhtisar.Model)
     | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat DaftarPelanggan.Model)
     | DaftarTarifTermuat (Result GagalMuat.LamanGagalDimuat DaftarTarif.Model)
     | DetailPelangganTermuat (Result GagalMuat.LamanGagalDimuat RiwayatPelanggan.Model)
     | DetailTagihanTermuat (Result GagalMuat.LamanGagalDimuat DetailTagihan.Model)
+    | PasswordTerganti (Result GagalMuat.LamanGagalDimuat Pengguna.Pengguna)
 
 
 getLaman : KondisiLaman -> ModelLamanTermuat
@@ -145,14 +147,6 @@ updateLaman laman msg model =
 
         tersimpan =
             model.tariftersimpan
-
-        kelaman kemodel kemsg subupd submsg submod =
-            let
-                ( modelbaru, cmdbaru ) =
-                    subupd submsg submod
-            in
-            { model | kondisilaman = LamanSudahDimuat (kemodel modelbaru) }
-                => Cmd.map kemsg cmdbaru
     in
     case ( msg, laman ) of
         ( SetRute r, _ ) ->
@@ -185,7 +179,7 @@ updateLaman laman msg model =
         ( DaftarTarifMsg submsg, LamanDaftarTarif submod ) ->
             let
                 ( ( modellaman, cmd ), msgdarilaman ) =
-                    DaftarTarif.update model.sesi submsg submod
+                    DaftarTarif.update sesi submsg submod
 
                 modelbaru =
                     case msgdarilaman of
@@ -197,6 +191,22 @@ updateLaman laman msg model =
             in
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanDaftarTarif modellaman) }
                 => Cmd.map DaftarTarifMsg cmd
+
+        ( GantiInformasiMsg submsg, LamanGantiInformasi submod ) ->
+            let
+                ( ( modellaman, cmd ), msgdarilaman ) =
+                    Ganti.update sesi submsg submod
+
+                modelbaru =
+                    case msgdarilaman of
+                        Ganti.NoOp ->
+                            model
+
+                        Ganti.SetPenggunaMsg p ->
+                            { model | sesi = { sesi | pengguna = Just p } }
+            in
+            { modelbaru | kondisilaman = LamanSudahDimuat (LamanGantiInformasi submod) }
+                => Cmd.map GantiInformasiMsg cmd
 
         ( IkhtisarTermuat (Ok i), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanIkhtisar i) }
@@ -234,6 +244,14 @@ updateLaman laman msg model =
                 => Cmd.none
 
         ( DaftarTarifTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
+        ( PasswordTerganti (Ok p), _ ) ->
+            { model | sesi = { sesi | pengguna = Just p } }
+                => Cmd.none
+
+        ( PasswordTerganti (Err g), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
@@ -333,6 +351,7 @@ viewLaman sesi laman =
         LamanGantiInformasi submodel ->
             Ganti.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna Bingkai.AktifGanti
+                |> Html.map GantiInformasiMsg
 
         LamanKeluar ->
             Html.text "keluar"
