@@ -67,6 +67,8 @@ viewTagihan tagihan =
             , viewtagihan tagihan
             ]
         , viewtariflagi tagihan.tarif (tagihan.minumSekarang - tagihan.minumLalu)
+        , button [ class "button is-primary is-pulled-right" ]
+            [ text "Bayar" ]
         ]
 
 
@@ -112,7 +114,7 @@ dikurangiataunol mulai sampai penggunaan =
     else if penggunaan > sampai then
         sampai - mulai
     else
-        penggunaan - sampai
+        penggunaan - mulai
 
 
 selisihataunol : Int -> Int -> Int
@@ -129,11 +131,20 @@ viewtariflagi tarif penggunaan =
         gunaawal =
             dikurangiataunol 0 tarif.sampaiawal penggunaan
 
+        bayarawal =
+            gunaawal * tarif.hargaawal
+
         gunatengah =
             dikurangiataunol tarif.sampaiawal tarif.sampaitengah penggunaan
 
+        bayartengah =
+            gunatengah * tarif.hargatengah
+
         gunaakhir =
             selisihataunol tarif.sampaitengah penggunaan
+
+        bayarakhir =
+            gunaakhir * tarif.hargaakhir
     in
     div [ class "content" ]
         [ table [ class "table" ]
@@ -150,21 +161,36 @@ viewtariflagi tarif penggunaan =
                     , td [ class "td" ] [ text <| toString tarif.sampaiawal ++ " M3" ]
                     , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargaawal ]
                     , td [ class "td" ] [ text <| toString gunaawal ++ " M3" ]
-                    , td [ class "td" ] [ text <| "Rp. " ++ toString (gunaawal * tarif.hargaawal) ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString bayarawal ]
                     ]
                 , tr [ class "tr" ]
                     [ td [ class "td" ] [ text <| toString tarif.sampaiawal ++ " M3" ]
                     , td [ class "td" ] [ text <| toString tarif.sampaitengah ++ " M3" ]
                     , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargatengah ]
                     , td [ class "td" ] [ text <| toString gunatengah ++ " M3" ]
-                    , td [ class "td" ] [ text <| "Rp. " ++ toString (gunatengah * tarif.hargatengah) ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString bayartengah ]
                     ]
                 , tr [ class "tr" ]
                     [ td [ class "td" ] [ text <| toString tarif.sampaitengah ++ " M3" ]
                     , td [ class "td" ] [ text "-" ]
                     , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.hargaakhir ]
                     , td [ class "td" ] [ text <| toString gunaakhir ++ " M3" ]
-                    , td [ class "td" ] [ text <| "Rp. " ++ toString (gunaakhir * tarif.hargaakhir) ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString bayarakhir ]
+                    ]
+                , tr [ class "tr" ]
+                    [ td [ class "td" ] []
+                    , td [ class "td" ] []
+                    , td [ class "td" ] []
+                    , td [ class "td" ] [ text "Biaya Beban" ]
+                    , td [ class "td" ] [ text <| "Rp. " ++ toString tarif.biayabeban ]
+                    ]
+                , tr [ class "tr" ]
+                    [ td [ class "td" ] []
+                    , td [ class "td" ] []
+                    , td [ class "td" ] []
+                    , th [ class "th" ] [ text "Total Bayar" ]
+                    , th [ class "th" ]
+                        [ text <| "Rp. " ++ toString (bayarawal + bayartengah + bayarakhir + tarif.biayabeban) ]
                     ]
                 ]
             ]
