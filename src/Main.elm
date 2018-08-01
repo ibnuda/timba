@@ -168,6 +168,14 @@ updateLaman laman msg model =
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanMasuk modellaman) }
                 => Cmd.map MasukMsg cmd
 
+        ( DetailTagihanMsg submsg, LamanDetailTagihan submod ) ->
+            let
+                ( ( modellaman, cmd ), msgdarilaman ) =
+                    DetailTagihan.update sesi submsg submod
+            in
+            { model | kondisilaman = LamanSudahDimuat (LamanDetailTagihan modellaman) }
+                => Cmd.map DetailTagihanMsg cmd
+
         ( TambahPelangganMsg submsg, LamanTambahPelanggan submod ) ->
             let
                 ( modellaman, cmd ) =

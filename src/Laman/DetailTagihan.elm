@@ -1,12 +1,14 @@
 module Laman.DetailTagihan exposing (..)
 
 import DaftarRute as Rute
+import Data.AuthToken as AuthToken
 import Data.Sesi as Sesi
 import Data.Tagihan as Tagihan
 import Data.Tagihan.Tarif as Tarif
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
+import Html.Events exposing (..)
 import Http as Http
 import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
@@ -38,14 +40,14 @@ init sesi nomet tahun bulan =
         |> Task.mapError gagalpenangan
 
 
-view : Sesi.Sesi -> Model -> Html msg
+view : Sesi.Sesi -> Model -> Html Msg
 view _ model =
     div []
         [ viewTagihan model.detailtagihan
         ]
 
 
-viewTagihan : Tagihan.Tagihan -> Html msg
+viewTagihan : Tagihan.Tagihan -> Html Msg
 viewTagihan tagihan =
     div [ class "container" ]
         [ nav [ class "breadcrumb", ariaLabel "breadcrumbs" ]
@@ -67,9 +69,20 @@ viewTagihan tagihan =
             , viewtagihan tagihan
             ]
         , viewtariflagi tagihan.tarif (tagihan.minumSekarang - tagihan.minumLalu)
-        , button [ class "button is-primary is-pulled-right" ]
-            [ text "Bayar" ]
+        , viewbayar tagihan.tanggalBayar
         ]
+
+
+viewbayar : String -> Html Msg
+viewbayar tanggalbayar =
+    if tanggalbayar == "Belum Dibayar" then
+        button
+            [ class "button is-primary "
+            , onClick KlikBayar
+            ]
+            [ text "Bayar" ]
+    else
+        div [] []
 
 
 viewpelanggan : Tagihan.TagihanPelanggan -> Html msg
@@ -198,26 +211,33 @@ viewtariflagi tarif penggunaan =
 
 
 type Msg
-    = NoOp
+    = KlikBayar
     | DetailTagihanTerunduh (Result Http.Error Tagihan.Tagihan)
 
 
-update : Sesi.Sesi -> Msg -> Model -> ( Model, Cmd Msg )
+type EksternalMsg
+    = NoOp
+    | SetTagihanMsg Tagihan.Tagihan
+
+
+update : Sesi.Sesi -> Msg -> Model -> ( ( Model, Cmd Msg ), EksternalMsg )
 update sesi msg model =
-    case ( sesi.pengguna, msg ) of
-        ( Nothing, _ ) ->
+    case msg of
+        KlikBayar ->
+            let
+                mtoken =
+                    Maybe.map .token sesi.pengguna
+            in
             model
-                => Rute.modifikasiUrl Rute.Masuk
+                => Http.send DetailTagihanTerunduh (puttagihan mtoken model.detailtagihan)
+                => NoOp
 
-        ( _, NoOp ) ->
-            model
-                => Cmd.none
-
-        ( _, DetailTagihanTerunduh (Ok dt) ) ->
+        DetailTagihanTerunduh (Ok dt) ->
             { model | detailtagihan = dt }
                 => Cmd.none
+                => NoOp
 
-        ( _, DetailTagihanTerunduh (Err g) ) ->
+        DetailTagihanTerunduh (Err g) ->
             let
                 pesangalat =
                     case g of
@@ -240,3 +260,9 @@ update sesi msg model =
             in
             { model | galat = pesangalat }
                 => Cmd.none
+                => NoOp
+
+
+puttagihan : Maybe AuthToken.AuthToken -> Tagihan.Tagihan -> Http.Request Tagihan.Tagihan
+puttagihan mtoken tagihan =
+    TagihanPelanggan.putBayarTagihan mtoken tagihan.nomorMeteran tagihan.tahun tagihan.bulan

@@ -23,11 +23,7 @@ type alias Model =
 
 init : Sesi.Sesi -> Model
 init sesi =
-    { galat = []
-    , passwordlama = ""
-    , passwordbaru = ""
-    , passwordbaruvalid = ""
-    }
+    initmodel
 
 
 initmodel : Model
@@ -128,12 +124,12 @@ update sesi msg mdl =
         SetPasswordBaruValid s ->
             case validate validasiulang mdl of
                 [] ->
-                    { mdl | passwordbaruvalid = s }
+                    { mdl | passwordbaruvalid = s, galat = [] }
                         => Cmd.none
                         => NoOp
 
                 x ->
-                    { mdl | passwordbaruvalid = s, galat = Debug.log "setpas" x }
+                    { mdl | passwordbaruvalid = s, galat = x }
                         => Cmd.none
                         => NoOp
 
