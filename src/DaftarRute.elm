@@ -13,6 +13,7 @@ type Rute
     | DaftarPelanggan
     | TambahPelanggan
     | DaftarTarif
+    | DaftarMinum
     | DetailPelanggan String
     | DetailTagihan String Int Int
     | GantiInformasi
@@ -27,6 +28,7 @@ rute =
         , Url.map DaftarPelanggan (s "pelanggan")
         , Url.map TambahPelanggan (s "tambah")
         , Url.map DaftarTarif (s "tarif")
+        , Url.map DaftarMinum (s "minum")
         , Url.map DetailPelanggan (s "pelanggan" </> string)
         , Url.map DetailTagihan (s "tagihan" </> string </> int </> int)
         , Url.map GantiInformasi (s "ganti")
@@ -56,6 +58,9 @@ ruteKeString laman =
 
                 DaftarTarif ->
                     [ "tarif" ]
+
+                DaftarMinum ->
+                    [ "minum" ]
 
                 DetailPelanggan nomet ->
                     [ "pelanggan", nomet ]

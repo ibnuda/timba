@@ -15,6 +15,7 @@ type LamanAktif
     | AktifPelanggan
     | AktifTambahPelanggan
     | AktifTarif
+    | AktifMinum
     | AktifGanti
 
 
@@ -64,6 +65,7 @@ navigasibar laman =
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
+                , span [ ariaHidden True ] []
                 ]
             ]
         , div [ id "navMenu", class "navbar-menu" ]
@@ -71,6 +73,7 @@ navigasibar laman =
                 [ tautannavbar laman Rute.DaftarPelanggan [ text "Pelanggan" ]
                 , tautannavbar laman Rute.TambahPelanggan [ text "Tambah Pelanggan" ]
                 , tautannavbar laman Rute.DaftarTarif [ text "Daftar Tarif" ]
+                , tautannavbar laman Rute.DaftarMinum [ text "Pencatatan Air" ]
                 ]
             , div [ class "navbar-end" ]
                 [ tautannavbar laman Rute.GantiInformasi [ text "Ubah Password" ]
@@ -109,6 +112,9 @@ isactive laman rute =
             True
 
         ( AktifTarif, Rute.DaftarTarif ) ->
+            True
+
+        ( AktifMinum, Rute.DaftarMinum ) ->
             True
 
         ( AktifGanti, Rute.GantiInformasi ) ->

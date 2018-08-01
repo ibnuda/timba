@@ -14,7 +14,7 @@ import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
 import Request.TagihanPelanggan as TagihanPelanggan
 import Task exposing (Task)
-import Util exposing ((=>))
+import Util exposing ((=>), penangangalat)
 
 
 type alias Model =
@@ -33,8 +33,9 @@ init sesi nomet tahun bulan =
             TagihanPelanggan.getSpesifik mtoken nomet tahun bulan
                 |> Http.toTask
 
-        gagalpenangan _ =
-            GagalMuat.lamanGagalDimuat "gagal memuat detail tagihan."
+        gagalpenangan =
+            penangangalat
+                >> GagalMuat.lamanGagalDimuat
     in
     Task.map (Model "") detailtagihan
         |> Task.mapError gagalpenangan
@@ -97,7 +98,7 @@ viewpelanggan pelanggan =
         ]
 
 
-viewtagihan : Tagihan.Tagihan -> Html msg
+viewtagihan : Tagihan.Tagihan -> Html Msg
 viewtagihan tagihan =
     let
         minum =
@@ -108,8 +109,17 @@ viewtagihan tagihan =
             [ viewbaristabel "Nomor Meteran" tagihan.nomorMeteran
             , viewbaristabel "Tanggal Tagihan" <| toString tagihan.tahun ++ " Bulan " ++ toString tagihan.bulan
             , viewbaristabel "Penggunaan Air" <| minum ++ " M3"
+            , viewtabelbayar tagihan.tanggalBayar
             ]
         ]
+
+
+viewtabelbayar : String -> Html Msg
+viewtabelbayar tanggalbayar =
+    if tanggalbayar == "Belum Dibayar" then
+        div [] []
+    else
+        viewbaristabel "Tanggal Bayar" tanggalbayar
 
 
 viewbaristabel : String -> String -> Html msg

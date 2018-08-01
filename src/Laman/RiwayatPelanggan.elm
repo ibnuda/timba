@@ -10,7 +10,7 @@ import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
 import Request.LihatPelanggan as LihatPelanggan
 import Task exposing (Task)
-import Util exposing ((=>))
+import Util exposing ((=>), penangangalat)
 
 
 type alias Model =
@@ -29,8 +29,9 @@ init sesi nomormeteran =
             LihatPelanggan.getDetailPelanggan mtoken nomormeteran
                 |> Http.toTask
 
-        gagalpenangan _ =
-            GagalMuat.lamanGagalDimuat "gagal memuat detail pelanggan"
+        gagalpenangan =
+            penangangalat
+                >> GagalMuat.lamanGagalDimuat
     in
     Task.map (Model "") dpel
         |> Task.mapError gagalpenangan

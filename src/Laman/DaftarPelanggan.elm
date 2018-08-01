@@ -10,7 +10,7 @@ import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
 import Request.LihatPelanggan as LihatPelanggan
 import Task exposing (Task)
-import Util exposing ((=>))
+import Util exposing ((=>), penangangalat)
 
 
 type alias Model =
@@ -29,8 +29,9 @@ init sesi =
             LihatPelanggan.getDaftarPelanggan mtoken
                 |> Http.toTask
 
-        gagalpenangan _ =
-            GagalMuat.lamanGagalDimuat "gagal memuat daftar pelanggan"
+        gagalpenangan =
+            penangangalat
+                >> GagalMuat.lamanGagalDimuat
     in
     Task.map (Model "") daftarpelanggan
         |> Task.mapError gagalpenangan
@@ -84,35 +85,16 @@ type Msg
 
 update : Sesi.Sesi -> Msg -> Model -> ( Model, Cmd Msg )
 update sesi msg model =
-    case ( sesi.pengguna, msg ) of
-        ( Nothing, _ ) ->
-            model => Rute.modifikasiUrl Rute.Masuk
-
-        ( Just _, NoOp ) ->
+    case msg of
+        NoOp ->
             model => Cmd.none
 
-        ( Just _, DaftarPelangganTerunduh (Err g) ) ->
+        DaftarPelangganTerunduh (Err g) ->
             let
                 pesangalat =
-                    case g of
-                        Http.BadStatus r ->
-                            r.body
-                                |> Decode.decodeString Decode.string
-                                |> Result.withDefault "bad code."
-
-                        Http.BadPayload yangsalah _ ->
-                            yangsalah
-
-                        Http.BadUrl u ->
-                            u ++ " salah."
-
-                        Http.Timeout ->
-                            "timeout."
-
-                        Http.NetworkError ->
-                            "cek sambungan internet."
+                    penangangalat g
             in
             { model | galat = pesangalat } => Cmd.none
 
-        ( Just _, DaftarPelangganTerunduh (Ok dp) ) ->
+        DaftarPelangganTerunduh (Ok dp) ->
             { model | daftarpelanggan = dp } => Cmd.none

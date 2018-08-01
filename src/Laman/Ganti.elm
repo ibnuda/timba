@@ -6,7 +6,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http as Http
-import Json.Decode as Decode
 import Request.KeluarMasuk as KeluarMasuk
 import Util exposing (..)
 import Validate exposing (Validator, firstError, fromErrors, ifBlank, validate)
@@ -157,23 +156,7 @@ update sesi msg mdl =
         GantiSelesai (Err r) ->
             let
                 pesangalat =
-                    case r of
-                        Http.BadStatus r ->
-                            r.body
-                                |> Decode.decodeString (Decode.field "errors" Decode.string)
-                                |> Result.withDefault "kok bisa, ya?"
-
-                        Http.BadPayload yangsalah _ ->
-                            yangsalah
-
-                        Http.BadUrl u ->
-                            u ++ " salah."
-
-                        Http.Timeout ->
-                            "timeout."
-
-                        Http.NetworkError ->
-                            "cek sambungan internet."
+                    penangangalat r
             in
             { mdl | galat = [ pesangalat ] }
                 => Cmd.none

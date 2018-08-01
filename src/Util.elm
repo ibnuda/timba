@@ -2,6 +2,7 @@ module Util exposing (..)
 
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
+import Http as Http
 import Json.Decode as Decode
 
 
@@ -40,3 +41,22 @@ onClickStopPropagation msg =
 appendErrors : { model | errors : List error } -> List error -> { model | errors : List error }
 appendErrors model errs =
     { model | errors = model.errors ++ errs }
+
+
+penangangalat : Http.Error -> String
+penangangalat x =
+    case x of
+        Http.BadUrl u ->
+            "url kaco."
+
+        Http.Timeout ->
+            "timeout"
+
+        Http.NetworkError ->
+            "network error."
+
+        Http.BadStatus r ->
+            r.body
+
+        Http.BadPayload s rs ->
+            rs.body

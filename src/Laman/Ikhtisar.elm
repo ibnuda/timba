@@ -9,6 +9,7 @@ import Http as Http
 import Laman.GagalMuat as GagalMuat
 import Request.LihatIkhtisar as LihatIkhtisar
 import Task exposing (Task)
+import Util exposing (..)
 
 
 type alias Model =
@@ -27,13 +28,8 @@ init sesi =
             LihatIkhtisar.getIkhtisar mtoken
                 |> Http.toTask
 
-        gagalpenangan x =
-            case x of
-                Http.BadUrl u -> GagalMuat.lamanGagalDimuat "url kaco."
-                Http.Timeout -> GagalMuat.lamanGagalDimuat "timeout"
-                Http.NetworkError -> GagalMuat.lamanGagalDimuat "network error."
-                Http.BadStatus r -> GagalMuat.lamanGagalDimuat r.body
-                Http.BadPayload s rs -> GagalMuat.lamanGagalDimuat rs.body
+        gagalpenangan =
+            penangangalat >> GagalMuat.lamanGagalDimuat
     in
     Task.map (Model "") detailikhtisar
         |> Task.mapError gagalpenangan

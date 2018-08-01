@@ -7,7 +7,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode as Decode exposing (..)
 import Request.KeluarMasuk exposing (..)
 import Util exposing (..)
 import Validate exposing (Validator, ifBlank, validate)
@@ -57,23 +56,7 @@ update mess model =
         MasukSelesai (Err g) ->
             let
                 pesangalat =
-                    case g of
-                        Http.BadStatus r ->
-                            r.body
-                                |> decodeString (field "errors" Decode.string)
-                                |> Result.withDefault "kok bisa, ya?"
-
-                        Http.BadPayload yangsalah _ ->
-                            yangsalah
-
-                        Http.BadUrl u ->
-                            u ++ " salah."
-
-                        Http.Timeout ->
-                            "timeout."
-
-                        Http.NetworkError ->
-                            "cek sambungan internet."
+                    penangangalat g
             in
             { model | galat = [ pesangalat ] }
                 => Cmd.none

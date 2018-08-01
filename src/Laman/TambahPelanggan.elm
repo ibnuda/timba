@@ -7,9 +7,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http as Http
-import Json.Decode as Decode
 import Request.LihatPelanggan as LihatPelanggan
-import Util exposing ((=>))
+import Util exposing ((=>), penangangalat)
 import Validate exposing (Validator, ifBlank, ifNotInt, validate)
 import Views.Borang as Borang
 
@@ -104,23 +103,7 @@ update sesi msg model =
         TambahPelangganSelesai (Err g) ->
             let
                 pesangalat =
-                    case g of
-                        Http.BadStatus r ->
-                            r.body
-                                |> Decode.decodeString (Decode.field "errors" Decode.string)
-                                |> Result.withDefault "kok bisa, ya?"
-
-                        Http.BadPayload yangsalah _ ->
-                            yangsalah
-
-                        Http.BadUrl u ->
-                            u ++ " salah."
-
-                        Http.Timeout ->
-                            "timeout."
-
-                        Http.NetworkError ->
-                            "cek sambungan internet."
+                    penangangalat g
             in
             { model | galat = [ pesangalat ] }
                 => Cmd.none

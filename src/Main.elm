@@ -6,6 +6,7 @@ import Data.Sesi exposing (Sesi)
 import Data.Tagihan.Tarif as Tarif
 import Html exposing (..)
 import Json.Decode as Decode
+import Laman.DaftarMinum as DaftarMinum
 import Laman.DaftarPelanggan as DaftarPelanggan
 import Laman.DaftarTarif as DaftarTarif
 import Laman.DetailTagihan as DetailTagihan
@@ -30,6 +31,7 @@ type ModelLamanTermuat
     | LamanDaftarPelanggan DaftarPelanggan.Model
     | LamanTambahPelanggan TambahPelanggan.Model
     | LamanDaftarTarif DaftarTarif.Model
+    | LamanDaftarMinum DaftarMinum.Model
     | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanDetailTagihan DetailTagihan.Model
     | LamanGantiInformasi Ganti.Model
@@ -56,12 +58,14 @@ type Msg
     | DaftarPelangganMsg DaftarPelanggan.Msg
     | TambahPelangganMsg TambahPelanggan.Msg
     | DaftarTarifMsg DaftarTarif.Msg
+    | DaftarMinumMsg DaftarMinum.Msg
     | DetailTagihanMsg DetailTagihan.Msg
     | GantiInformasiMsg Ganti.Msg
     | RiwayatPelangganMsg RiwayatPelanggan.Msg
     | IkhtisarTermuat (Result GagalMuat.LamanGagalDimuat Ikhtisar.Model)
     | DaftarPelangganTermuat (Result GagalMuat.LamanGagalDimuat DaftarPelanggan.Model)
     | DaftarTarifTermuat (Result GagalMuat.LamanGagalDimuat DaftarTarif.Model)
+    | DaftarMinumTermuat (Result GagalMuat.LamanGagalDimuat DaftarMinum.Model)
     | DetailPelangganTermuat (Result GagalMuat.LamanGagalDimuat RiwayatPelanggan.Model)
     | DetailTagihanTermuat (Result GagalMuat.LamanGagalDimuat DetailTagihan.Model)
     | PasswordTerganti (Result GagalMuat.LamanGagalDimuat Pengguna.Pengguna)
@@ -105,6 +109,9 @@ setRute mrute model =
 
         ( Just p, Just Rute.DaftarTarif ) ->
             transisi DaftarTarifTermuat (DaftarTarif.init model.sesi)
+
+        ( Just p, Just Rute.DaftarMinum ) ->
+            transisi DaftarMinumTermuat (DaftarMinum.init model.sesi)
 
         ( Just p, Just (Rute.DetailPelanggan nomormeteran) ) ->
             transisi DetailPelangganTermuat
@@ -200,6 +207,14 @@ updateLaman laman msg model =
             { modelbaru | kondisilaman = LamanSudahDimuat (LamanDaftarTarif modellaman) }
                 => Cmd.map DaftarTarifMsg cmd
 
+        ( DaftarMinumMsg submsg, LamanDaftarMinum submod ) ->
+            let
+                ( modellaman, cmd ) =
+                    DaftarMinum.update sesi submsg submod
+            in
+            { model | kondisilaman = LamanSudahDimuat (LamanDaftarMinum modellaman) }
+                => Cmd.map DaftarMinumMsg cmd
+
         ( GantiInformasiMsg submsg, LamanGantiInformasi submod ) ->
             let
                 ( ( modellaman, cmd ), msgdarilaman ) =
@@ -252,6 +267,14 @@ updateLaman laman msg model =
                 => Cmd.none
 
         ( DaftarTarifTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
+        ( DaftarMinumTermuat (Ok dm), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanDaftarMinum dm) }
+                => Cmd.none
+
+        ( DaftarMinumTermuat (Err g), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
@@ -344,6 +367,11 @@ viewLaman sesi laman =
             DaftarTarif.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna Bingkai.AktifTarif
                 |> Html.map DaftarTarifMsg
+
+        LamanDaftarMinum submodel ->
+            DaftarMinum.view sesi submodel
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifMinum
+                |> Html.map DaftarMinumMsg
 
         LamanRiwayatPelanggan submodel ->
             RiwayatPelanggan.view sesi submodel

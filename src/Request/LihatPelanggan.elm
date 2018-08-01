@@ -2,9 +2,11 @@ module Request.LihatPelanggan exposing (..)
 
 import Data.AuthToken exposing (AuthToken, withAuthorization)
 import Data.DetailPelanggan as DetailPelanggan exposing (..)
+import Data.MinumPelanggan as Minum
 import Data.Pelanggan as Pelanggan exposing (..)
 import Http
 import HttpBuilder exposing (RequestBuilder, withBody, withExpect, withQueryParams)
+import Json.Decode as Decode
 import Json.Encode as Encode
 import Request.Bantuan exposing (apiUrl)
 import Util exposing ((=>))
@@ -58,5 +60,19 @@ postTambahPelanggan mtoken { namapelanggan, nomortelepon, password, alamat, wila
         |> HttpBuilder.post
         |> HttpBuilder.withExpect ekspektasi
         |> HttpBuilder.withJsonBody pelanggan
+        |> withAuthorization mtoken
+        |> HttpBuilder.toRequest
+
+
+getDaftarMinumPelanggan : Maybe AuthToken -> Http.Request (List Minum.StatusMinum)
+getDaftarMinumPelanggan mtoken =
+    let
+        ekspektasi =
+            Decode.list Minum.decoder
+                |> Http.expectJson
+    in
+    apiUrl "/petugas/air"
+        |> HttpBuilder.get
+        |> HttpBuilder.withExpect ekspektasi
         |> withAuthorization mtoken
         |> HttpBuilder.toRequest

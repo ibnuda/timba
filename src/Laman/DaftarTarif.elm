@@ -37,8 +37,9 @@ init sesi =
             LihatIkhtisar.getDaftarTarif mtoken
                 |> Http.toTask
 
-        gagalpenangan _ =
-            GagalMuat.lamanGagalDimuat "gagal memuat ikhtisar."
+        gagalpenangan =
+            penangangalat
+                >> GagalMuat.lamanGagalDimuat
     in
     Task.map (Model [] "0" "0" "0" "0" "0" "0") daftartarif
         |> Task.mapError gagalpenangan
