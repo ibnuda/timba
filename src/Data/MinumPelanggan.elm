@@ -21,3 +21,16 @@ decoder =
         |> required "nomor_meteran" Decode.string
         |> required "alamat" Decode.string
         |> required "sudah_catat" Decode.bool
+
+type alias Minum =
+    { tahun : Int
+    , bulan : Int
+    , minum : Int
+    }
+
+decoderMinum : Decode.Decoder Minum
+decoderMinum =
+    decode Minum
+        |> required "tahun" Decode.int
+        |> required "bulan" Decode.int
+        |> required "minum" Decode.int

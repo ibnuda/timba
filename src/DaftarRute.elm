@@ -17,6 +17,7 @@ type Rute
     | DetailPelanggan String
     | DetailTagihan String Int Int
     | GantiInformasi
+    | GambarMinum
     | Keluar
 
 
@@ -32,6 +33,7 @@ rute =
         , Url.map DetailPelanggan (s "pelanggan" </> string)
         , Url.map DetailTagihan (s "tagihan" </> string </> int </> int)
         , Url.map GantiInformasi (s "ganti")
+        , Url.map GambarMinum (s "gambar")
         , Url.map Keluar (s "keluar")
         ]
 
@@ -70,6 +72,9 @@ ruteKeString laman =
 
                 GantiInformasi ->
                     [ "ganti" ]
+
+                GambarMinum ->
+                    [ "gambar" ]
 
                 Keluar ->
                     [ "keluar" ]

@@ -17,6 +17,7 @@ type LamanAktif
     | AktifTarif
     | AktifMinum
     | AktifGanti
+    | AktifGambar
 
 
 bingkai : Maybe Pengguna.Pengguna -> LamanAktif -> Html msg -> Html msg
@@ -66,6 +67,7 @@ navigasibar laman =
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
                 , span [ ariaHidden True ] []
+                , span [ ariaHidden True ] []
                 ]
             ]
         , div [ id "navMenu", class "navbar-menu" ]
@@ -74,6 +76,7 @@ navigasibar laman =
                 , tautannavbar laman Rute.TambahPelanggan [ text "Tambah Pelanggan" ]
                 , tautannavbar laman Rute.DaftarTarif [ text "Daftar Tarif" ]
                 , tautannavbar laman Rute.DaftarMinum [ text "Pencatatan Air" ]
+                , tautannavbar laman Rute.GambarMinum [ text "Grafik" ]
                 ]
             , div [ class "navbar-end" ]
                 [ tautannavbar laman Rute.GantiInformasi [ text "Ubah Password" ]
@@ -118,6 +121,9 @@ isactive laman rute =
             True
 
         ( AktifGanti, Rute.GantiInformasi ) ->
+            True
+
+        ( AktifGambar, Rute.GambarMinum ) ->
             True
 
         ( _, _ ) ->

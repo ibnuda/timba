@@ -11,6 +11,7 @@ import Laman.DaftarPelanggan as DaftarPelanggan
 import Laman.DaftarTarif as DaftarTarif
 import Laman.DetailTagihan as DetailTagihan
 import Laman.GagalMuat as GagalMuat
+import Laman.GambarPenggunaan as Gambar
 import Laman.Ganti as Ganti
 import Laman.Ikhtisar as Ikhtisar
 import Laman.Masuk as Masuk
@@ -35,6 +36,7 @@ type ModelLamanTermuat
     | LamanRiwayatPelanggan RiwayatPelanggan.Model
     | LamanDetailTagihan DetailTagihan.Model
     | LamanGantiInformasi Ganti.Model
+    | LamanGambar Gambar.Model
     | LamanKeluar
     | LamanGagalMuat GagalMuat.LamanGagalDimuat
 
@@ -69,6 +71,7 @@ type Msg
     | DetailPelangganTermuat (Result GagalMuat.LamanGagalDimuat RiwayatPelanggan.Model)
     | DetailTagihanTermuat (Result GagalMuat.LamanGagalDimuat DetailTagihan.Model)
     | PasswordTerganti (Result GagalMuat.LamanGagalDimuat Pengguna.Pengguna)
+    | GambarTermuat (Result GagalMuat.LamanGagalDimuat Gambar.Model)
 
 
 getLaman : KondisiLaman -> ModelLamanTermuat
@@ -124,6 +127,9 @@ setRute mrute model =
         ( Just p, Just Rute.GantiInformasi ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanGantiInformasi Ganti.initmodel) }
                 => Cmd.none
+
+        ( Just p, Just Rute.GambarMinum ) ->
+            transisi GambarTermuat (Gambar.init model.sesi)
 
         ( Just p, Just Rute.Keluar ) ->
             let
@@ -286,6 +292,14 @@ updateLaman laman msg model =
             { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
                 => Cmd.none
 
+        ( GambarTermuat (Ok p), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGambar p) }
+                => Cmd.none
+
+        ( GambarTermuat (Err g), _ ) ->
+            { model | kondisilaman = LamanSudahDimuat (LamanGagalMuat g) }
+                => Cmd.none
+
         ( DetailPelangganTermuat (Ok dp), _ ) ->
             { model | kondisilaman = LamanSudahDimuat (LamanRiwayatPelanggan dp) }
                 => Cmd.none
@@ -387,6 +401,10 @@ viewLaman sesi laman =
             Ganti.view sesi submodel
                 |> Bingkai.bingkai sesi.pengguna Bingkai.AktifGanti
                 |> Html.map GantiInformasiMsg
+
+        LamanGambar submodel ->
+            Gambar.view submodel
+                |> Bingkai.bingkai sesi.pengguna Bingkai.AktifGambar
 
         LamanKeluar ->
             Html.text "keluar"

@@ -1,6 +1,7 @@
 module Request.LihatIkhtisar exposing (..)
 
 import Data.AuthToken exposing (AuthToken, withAuthorization)
+import Data.MinumPelanggan as Minum
 import Data.Ringkasan as Ringkasan
 import Data.Tagihan.Tarif as Tarif
 import Http
@@ -32,6 +33,19 @@ getDaftarTarif mtoken =
             Decode.list Tarif.decoderTarif |> Http.expectJson
     in
     apiUrl "/tarif"
+        |> HttpBuilder.get
+        |> HttpBuilder.withExpect expect
+        |> withAuthorization mtoken
+        |> HttpBuilder.toRequest
+
+
+getDaftarMinum : Maybe AuthToken -> Http.Request (List Minum.Minum)
+getDaftarMinum mtoken =
+    let
+        expect =
+            Decode.list Minum.decoderMinum |> Http.expectJson
+    in
+    apiUrl "/minum"
         |> HttpBuilder.get
         |> HttpBuilder.withExpect expect
         |> withAuthorization mtoken

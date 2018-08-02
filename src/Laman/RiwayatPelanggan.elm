@@ -5,6 +5,7 @@ import Data.DetailPelanggan as DPelanggan
 import Data.Sesi as Sesi
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Aria exposing (..)
 import Http as Http
 import Json.Decode as Decode
 import Laman.GagalMuat as GagalMuat
@@ -39,9 +40,25 @@ init sesi nomormeteran =
 
 view : Sesi.Sesi -> Model -> Html msg
 view _ model =
-    div [ class "content" ]
-        [ viewdetail model.detailpelanggan
-        , viewriwayat model.detailpelanggan
+    div [ class "container" ]
+        [ nav [ class "breadcrumb", ariaLabel "breadcrumbs" ]
+            [ ul []
+                [ li [] [ a [ Rute.href Rute.Beranda ] [ text "Beranda" ] ]
+                , li [] [ a [ Rute.href Rute.DaftarPelanggan ] [ text "Daftar Pelanggan" ] ]
+                , li []
+                    [ a
+                        [ Rute.href (Rute.DetailPelanggan model.detailpelanggan.nomorMeteran)
+                        , class "is-active"
+                        , attribute "aria-current" "page"
+                        ]
+                        [ text model.detailpelanggan.namaPelanggan ]
+                    ]
+                ]
+            ]
+        , div [ class "content" ]
+            [ viewdetail model.detailpelanggan
+            , viewriwayat model.detailpelanggan
+            ]
         ]
 
 
@@ -86,7 +103,8 @@ viewriwayat dp =
                 , th [ class "th" ] [ text "Tanggal Bayar" ]
                 ]
             ]
-        , tbody [ class "tbody" ] <| List.map (viewtagihansimple dp.nomorMeteran) dp.penggunaanAir
+        , List.map (viewtagihansimple dp.nomorMeteran) dp.penggunaanAir
+            |> tbody [ class "tbody" ]
         ]
 
 
